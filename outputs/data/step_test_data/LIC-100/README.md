@@ -19,4 +19,3 @@ Set-point Input (LIC-100 - SP)
 ##### **CONTROLLER PARAMETERS**
 **Kc - Tight     : 77.80 %TO/%CO**
 **Kc - Averaging : 1.0   %TO/%CO**
-

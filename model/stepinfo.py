@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import asdict, dataclass
-from typing import Optional
 
 import numpy as np
 from numpy import trapezoid as _trapz
@@ -33,7 +32,7 @@ class StepMetrics:
     SettlingTime: float = np.nan
     SettlingMin: float = np.nan
     SettlingMax: float = np.nan
-    Overshoot: float = np.nan   # [%]
+    Overshoot: float = np.nan  # [%]
     Undershoot: float = np.nan  # [%]
     DecayRatio: float = np.nan
     Peak: float = np.nan
@@ -133,14 +132,13 @@ class StepInfo:
             self.u = np.asarray(u, dtype=float)
             if self.u.shape != self.time.shape:
                 raise ValueError(
-                    f"input shape {self.u.shape} must match "
-                    f"time shape {self.time.shape}"
+                    f'input shape {self.u.shape} must match time shape {self.time.shape}'
                 )
 
         # --- evaluation window indices ---
         self._i0 = int(np.searchsorted(self.time, self.step_time))
         if self.end_time is not None:
-            self._i1 = int(np.searchsorted(self.time, self.end_time, side="right"))
+            self._i1 = int(np.searchsorted(self.time, self.end_time, side='right'))
         else:
             self._i1 = len(self.time)
 
@@ -151,7 +149,7 @@ class StepInfo:
         if y_final is not None:
             self.yfinal = float(y_final)
         else:
-            self.yfinal = float(self._y[-1]) if len(self._y) > 0 else float("nan")
+            self.yfinal = float(self._y[-1]) if len(self._y) > 0 else float('nan')
 
         if y_initial is not None:
             self.y_initial = float(y_initial)
@@ -178,7 +176,7 @@ class StepInfo:
 
         if len(T_post) == 0:
             warnings.warn(
-                "Evaluation window is empty — check step_time and end_time.",
+                'Evaluation window is empty — check step_time and end_time.',
                 stacklevel=3,
             )
             return m
@@ -188,7 +186,7 @@ class StepInfo:
         delta = InfValue - InitialValue
 
         if np.isnan(InfValue) or np.isinf(InfValue):
-            warnings.warn("yfinal is NaN or Inf — returning NaN metrics.", stacklevel=3)
+            warnings.warn('yfinal is NaN or Inf — returning NaN metrics.', stacklevel=3)
             return m
 
         t_relative = T_post - self.step_time
@@ -226,13 +224,9 @@ class StepInfo:
         error_abs = np.abs(yout_post - InfValue)
 
         if delta == 0:
-            outside = np.nonzero(
-                error_abs >= self.SettlingTimeThreshold * np.abs(InfValue)
-            )[0]
+            outside = np.nonzero(error_abs >= self.SettlingTimeThreshold * np.abs(InfValue))[0]
         else:
-            outside = np.nonzero(
-                error_abs >= self.SettlingTimeThreshold * np.abs(delta)
-            )[0]
+            outside = np.nonzero(error_abs >= self.SettlingTimeThreshold * np.abs(delta))[0]
 
         if outside.size == 0:
             m.SettlingTime = 0.0
@@ -290,11 +284,7 @@ class StepInfo:
         valid_peaks = []
         for p in peak_indices:
             val = float(yout_post[p])
-            if (
-                (delta > 0 and val > InfValue)
-                or (delta < 0 and val < InfValue)
-                or (delta == 0)
-            ):
+            if (delta > 0 and val > InfValue) or (delta < 0 and val < InfValue) or (delta == 0):
                 valid_peaks.append(val)
 
         if len(valid_peaks) >= 2:
@@ -322,66 +312,65 @@ class StepInfo:
     def __repr__(self) -> str:
         W = 12  # value column width (characters)
         L = 18  # label column width (characters)
-        SEP = "=" * 62
-        DASH = "-" * 58
+        SEP = '=' * 62
+        DASH = '-' * 58
 
         def _na(v: float) -> bool:
             return np.isnan(v) or np.isinf(v)
 
         def _fmt_time(v: float) -> str:
-            return "---".rjust(W) if _na(v) else f"{v:{W}.2f}"
+            return '---'.rjust(W) if _na(v) else f'{v:{W}.2f}'
 
         def _fmt_pct(v: float) -> str:
-            return "---".rjust(W) if _na(v) else f"{v:{W}.4f}"
+            return '---'.rjust(W) if _na(v) else f'{v:{W}.4f}'
 
         def _fmt_val(v: float) -> str:
-            return "---".rjust(W) if _na(v) else f"{v:{W}.6g}"
+            return '---'.rjust(W) if _na(v) else f'{v:{W}.6g}'
 
         def _fmt_norm(v: float) -> str:
-            return "---".rjust(W) if _na(v) else f"{v:{W}.5f}"
+            return '---'.rjust(W) if _na(v) else f'{v:{W}.5f}'
 
-        def _row(label: str, val: str, suffix: str = "") -> str:
-            return f"  {label:<{L}}: {val}  {suffix}".rstrip()
+        def _row(label: str, val: str, suffix: str = '') -> str:
+            return f'  {label:<{L}}: {val}  {suffix}'.rstrip()
 
         m = self.metrics
 
-        thresh_str = f"+/- {self.SettlingTimeThreshold * 100:.2f} %"
+        thresh_str = f'+/- {self.SettlingTimeThreshold * 100:.2f} %'
         lo_pct = int(round(self.RiseTimeLimits[0] * 100))
         hi_pct = int(round(self.RiseTimeLimits[1] * 100))
-        rise_str = f"({lo_pct} % - {hi_pct} %)"
-        end_part = f"    end_time  =  {self.end_time:.2f} s" if self.end_time else ""
-        peak_at = f"at {m.PeakTime:.2f} s" if not _na(m.PeakTime) else ""
+        rise_str = f'({lo_pct} % - {hi_pct} %)'
+        end_part = f'    end_time  =  {self.end_time:.2f} s' if self.end_time else ''
+        peak_at = f'at {m.PeakTime:.2f} s' if not _na(m.PeakTime) else ''
 
         lines = [
             SEP,
-            "  StepInfo",
-            f"  step_time  =  {self.step_time:.2f} s{end_part}",
-            f"  y_initial  =  {self.y_initial:.6g}"
-            f"    ->    y_final  =  {self.yfinal:.6g}",
+            '  StepInfo',
+            f'  step_time  =  {self.step_time:.2f} s{end_part}',
+            f'  y_initial  =  {self.y_initial:.6g}    ->    y_final  =  {self.yfinal:.6g}',
             SEP,
-            "",
-            "  TIME-DOMAIN METRICS",
-            f"  {DASH}",
-            _row("Rise Time", _fmt_time(m.RiseTime), f"s    {rise_str}"),
-            _row("Settling Time", _fmt_time(m.SettlingTime), f"s    ({thresh_str})"),
-            _row("Peak", _fmt_val(m.Peak), peak_at),
-            _row("Overshoot", _fmt_pct(m.Overshoot), "%"),
-            _row("Undershoot", _fmt_pct(m.Undershoot), "%"),
-            _row("Decay Ratio", _fmt_pct(m.DecayRatio)),
-            _row("Settling Min", _fmt_val(m.SettlingMin)),
-            _row("Settling Max", _fmt_val(m.SettlingMax)),
-            _row("Steady State", _fmt_val(m.SteadyStateValue)),
-            "",
-            "  INTEGRAL PERFORMANCE INDICES",
-            f"  {DASH}",
-            _row("IAE", _fmt_val(m.IAE)),
-            _row("ISE", _fmt_val(m.ISE)),
-            _row("ITAE", _fmt_val(m.ITAE)),
-            _row("ITSE", _fmt_val(m.ITSE)),
+            '',
+            '  TIME-DOMAIN METRICS',
+            f'  {DASH}',
+            _row('Rise Time', _fmt_time(m.RiseTime), f's    {rise_str}'),
+            _row('Settling Time', _fmt_time(m.SettlingTime), f's    ({thresh_str})'),
+            _row('Peak', _fmt_val(m.Peak), peak_at),
+            _row('Overshoot', _fmt_pct(m.Overshoot), '%'),
+            _row('Undershoot', _fmt_pct(m.Undershoot), '%'),
+            _row('Decay Ratio', _fmt_pct(m.DecayRatio)),
+            _row('Settling Min', _fmt_val(m.SettlingMin)),
+            _row('Settling Max', _fmt_val(m.SettlingMax)),
+            _row('Steady State', _fmt_val(m.SteadyStateValue)),
+            '',
+            '  INTEGRAL PERFORMANCE INDICES',
+            f'  {DASH}',
+            _row('IAE', _fmt_val(m.IAE)),
+            _row('ISE', _fmt_val(m.ISE)),
+            _row('ITAE', _fmt_val(m.ITAE)),
+            _row('ITSE', _fmt_val(m.ITSE)),
         ]
 
         lines.append(SEP)
-        return "\n".join(lines)
+        return '\n'.join(lines)
 
     def to_dict(self) -> dict:
         """Return metrics as a plain dict."""
@@ -411,18 +400,18 @@ class StepInfo:
             return {}
 
         norm = {
-            "IAE_normalized": self.metrics.IAE / (time_window * ref_value),
-            "ISE_normalized": (
+            'IAE_normalized': self.metrics.IAE / (time_window * ref_value),
+            'ISE_normalized': (
                 self.metrics.ISE / (time_window * ref_value**2)
                 if not np.isnan(self.metrics.ISE)
                 else np.nan
             ),
-            "ITAE_normalized": (
+            'ITAE_normalized': (
                 self.metrics.ITAE / (time_window**2 * ref_value)
                 if not np.isnan(self.metrics.ITAE)
                 else np.nan
             ),
-            "ITSE_normalized": (
+            'ITSE_normalized': (
                 self.metrics.ITSE / (time_window**2 * ref_value**2)
                 if not np.isnan(self.metrics.ITSE)
                 else np.nan
@@ -431,22 +420,18 @@ class StepInfo:
 
         # cap each term at 1.0; NaN propagates as maximum penalty
         overshoot_norm = (
-            1.0
-            if np.isnan(self.metrics.Overshoot)
-            else min(self.metrics.Overshoot / 100.0, 1.0)
+            1.0 if np.isnan(self.metrics.Overshoot) else min(self.metrics.Overshoot / 100.0, 1.0)
         )
         settling_norm = (
             1.0
             if np.isnan(self.metrics.SettlingTime)
             else min(self.metrics.SettlingTime / time_window, 1.0)
         )
-        iae_raw = norm.get("IAE_normalized", np.nan)
+        iae_raw = norm.get('IAE_normalized', np.nan)
         iae_norm = 1.0 if np.isnan(iae_raw) else min(iae_raw, 1.0)
 
-        perf_cost = (
-            0.4 * overshoot_norm + 0.3 * settling_norm + 0.3 * iae_norm
-        ) * 100.0
-        norm["PerformanceIndex"] = float(np.clip(perf_cost, 0.0, 100.0))
+        perf_cost = (0.4 * overshoot_norm + 0.3 * settling_norm + 0.3 * iae_norm) * 100.0
+        norm['PerformanceIndex'] = float(np.clip(perf_cost, 0.0, 100.0))
 
         return norm
 
@@ -469,8 +454,7 @@ class StepInfo:
             return pd.DataFrame([asdict(self.metrics)])
         except ImportError:
             raise ImportError(
-                "pandas is required for to_dataframe(). "
-                "Install it with: pip install pandas"
+                'pandas is required for to_dataframe(). Install it with: pip install pandas'
             )
 
     # --- class-level factories ---
@@ -480,7 +464,7 @@ class StepInfo:
         cls,
         time: np.ndarray,
         loops: dict[str, dict],
-    ) -> dict[str, "StepInfo | None"]:
+    ) -> dict[str, StepInfo | None]:
         """Construct a StepInfo for each loop from a shared time vector.
 
         Parameters
@@ -501,14 +485,14 @@ class StepInfo:
             try:
                 results[name] = cls(time=time, **kwargs)
             except Exception as exc:
-                warnings.warn(f"[{name}] failed: {exc}")
+                warnings.warn(f'[{name}] failed: {exc}', stacklevel=2)
                 results[name] = None
         return results
 
     @classmethod
     def summary_dataframe(
         cls,
-        results: dict[str, Optional["StepInfo"]],
+        results: dict[str, StepInfo | None],
     ):
         """Build a multi-index summary DataFrame from a dict of StepInfo objects.
 
@@ -530,7 +514,7 @@ class StepInfo:
         try:
             import pandas as pd
         except ImportError:
-            raise ImportError("pandas is required. pip install pandas")
+            raise ImportError('pandas is required. pip install pandas')
 
         rows = {}
         for name, si in results.items():

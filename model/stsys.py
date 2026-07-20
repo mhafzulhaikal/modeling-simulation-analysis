@@ -68,8 +68,8 @@ class SensorTransmitterSystem(ControlElement):
     >>> lt = SensorTransmitterSystem('LT_100', hi=3.0, low=0.0, tauT=0.0)
     """
 
-    INPUT_NAMES = ["PV"]
-    OUTPUT_NAMES = ["C"]
+    INPUT_NAMES = ['PV']
+    OUTPUT_NAMES = ['C']
     # STATE_NAMES is set at the instance level in __init__ based on tauT,
     # before super().__init__() is called.  Python's attribute lookup
     # (instance → class) ensures the base class sees the correct value.
@@ -82,18 +82,18 @@ class SensorTransmitterSystem(ControlElement):
         tauT: float,
     ) -> None:
         if hi <= low:
-            raise ValueError(f"hi ({hi}) must be greater than low ({low}).")
+            raise ValueError(f'hi ({hi}) must be greater than low ({low}).')
         if tauT < 0:
-            raise ValueError(f"tauT must be >= 0, got {tauT}.")
+            raise ValueError(f'tauT must be >= 0, got {tauT}.')
 
         # Dynamic if tauT > 0 (1 state: PVm); static (algebraic) if tauT == 0.
-        self.STATE_NAMES = ["PVm"] if tauT > 0 else []
+        self.STATE_NAMES = ['PVm'] if tauT > 0 else []
 
         self.params = {
-            "name": str(name),
-            "hi": float(hi),
-            "low": float(low),
-            "tauT": float(tauT),
+            'name': str(name),
+            'hi': float(hi),
+            'low': float(low),
+            'tauT': float(tauT),
         }
         super().__init__()
 
@@ -129,7 +129,7 @@ class SensorTransmitterSystem(ControlElement):
         """
         PVm = float(x[0])
         PV = float(u[0])
-        tauT = float(params["tauT"])
+        tauT = float(params['tauT'])
 
         dPVm_dt = (PV - PVm) / tauT
         return [dPVm_dt]
@@ -163,5 +163,5 @@ class SensorTransmitterSystem(ControlElement):
         # Static sensor: no state exists; scale the raw input PV directly.
         PVm = float(x[0]) if x is not None and len(x) > 0 else float(u[0])
 
-        C = (PVm - params["low"]) / (params["hi"] - params["low"]) * 100.0
+        C = (PVm - params['low']) / (params['hi'] - params['low']) * 100.0
         return [C]

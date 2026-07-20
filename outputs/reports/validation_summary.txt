@@ -43,4 +43,3 @@
      - R2 indicates whether Python follows the variation pattern of HYSYS, but
        it should not be interpreted as agreement by itself. Perfect correlation
        (R2=1) can still occur alongside structural offsets (biases).
-

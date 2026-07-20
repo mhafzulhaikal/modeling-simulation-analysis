@@ -39,8 +39,8 @@ class FOPDTModel:
 
     def __str__(self) -> str:
         return (
-            f"K={self.K:.4f}, tau={self.tau:.2f} s, t0={self.t0:.2f} s, "
-            f"t0/tau={self.t0 / self.tau:.3f}"
+            f'K={self.K:.4f}, tau={self.tau:.2f} s, t0={self.t0:.2f} s, '
+            f't0/tau={self.t0 / self.tau:.3f}'
         )
 
 
@@ -90,15 +90,13 @@ class FOPDTIdentifier:
         max_change_idx = int(np.argmax(np.abs(input_diff)))
 
         self.step_time = self.time[max_change_idx]
-        self.step_magnitude = (
-            self.input[max_change_idx + 1] - self.input[max_change_idx]
-        )
-        self.step_direction = "up" if self.step_magnitude > 0 else "down"
+        self.step_magnitude = self.input[max_change_idx + 1] - self.input[max_change_idx]
+        self.step_direction = 'up' if self.step_magnitude > 0 else 'down'
 
         if self.verbose:
             print(
-                f"Step detected: {self.step_direction} "
-                f"by {self.step_magnitude:.2f} at t={self.step_time:.2f} s"
+                f'Step detected: {self.step_direction} '
+                f'by {self.step_magnitude:.2f} at t={self.step_time:.2f} s'
             )
 
     def _normalize_signals(self) -> None:
@@ -206,7 +204,7 @@ class FOPDTIdentifier:
 
         return FOPDTModel(K=K, tau=max(tau, 0.1), t0=max(t0, 0.0))
 
-    def identify_optimization(self, method: str = "fast") -> FOPDTModel:
+    def identify_optimization(self, method: str = 'fast') -> FOPDTModel:
         """Optimize FOPDT parameters by minimizing fit error.
 
         Parameters
@@ -226,9 +224,9 @@ class FOPDTIdentifier:
         x0 = [initial.K, initial.tau, initial.t0]
 
         if self.verbose:
-            print(f"Initial guess (two-point): {initial}")
+            print(f'Initial guess (two-point): {initial}')
 
-        if method == "robust":
+        if method == 'robust':
             k_bounds = (min(0.1 * x0[0], 10.0 * x0[0]), max(0.1 * x0[0], 10.0 * x0[0]))
             if k_bounds[0] == k_bounds[1]:
                 k_bounds = (-1.0, 1.0)
@@ -244,7 +242,7 @@ class FOPDTIdentifier:
                 maxiter=300,
                 tol=1e-5,
                 workers=1,
-                updating="deferred",
+                updating='deferred',
                 polish=True,
             )
         else:
@@ -265,7 +263,7 @@ class FOPDTIdentifier:
                     [k_min, 0.01 * x0[1], 0.0],
                     [k_max, 100.0 * x0[1], max(2.0 * x0[2], 0.1)],
                 ),
-                method="trf",
+                method='trf',
                 ftol=1e-8,
                 xtol=1e-8,
                 gtol=1e-8,
@@ -275,12 +273,12 @@ class FOPDTIdentifier:
         K, tau, t0 = result.x
 
         if self.verbose:
-            print(f"Optimization result: K={K:.4f}, tau={tau:.2f} s, t0={t0:.2f} s")
-            if hasattr(result.fun, "__len__"):
+            print(f'Optimization result: K={K:.4f}, tau={tau:.2f} s, t0={t0:.2f} s')
+            if hasattr(result.fun, '__len__'):
                 cost = float(np.sum(result.fun**2))
             else:
                 cost = float(result.fun)
-            print(f"Cost: {cost:.6e}")
+            print(f'Cost: {cost:.6e}')
 
         return FOPDTModel(K=K, tau=tau, t0=t0)
 
@@ -299,9 +297,7 @@ class FOPDTIdentifier:
             ``'RMSE'`` (root mean squared error), ``'SSE'`` (sum of squared
             errors).  Metrics are computed on the post-step window only.
         """
-        model_response = self._fopdt_response(
-            np.array([model.K, model.tau, model.t0]), self.time
-        )
+        model_response = self._fopdt_response(np.array([model.K, model.tau, model.t0]), self.time)
 
         valid_mask = self.time > self.step_time
         y_actual = self.output[valid_mask]
@@ -312,7 +308,7 @@ class FOPDTIdentifier:
         r_squared = 1.0 - ss_res / ss_tot if ss_tot > 0.0 else 0.0
         rmse = float(np.sqrt(np.mean((y_actual - y_model) ** 2)))
 
-        return {"R2": r_squared, "RMSE": rmse, "SSE": ss_res}
+        return {'R2': r_squared, 'RMSE': rmse, 'SSE': ss_res}
 
 
 # =============================================================================
@@ -324,9 +320,9 @@ def identify_fopdt(
     time: np.ndarray,
     input_data: np.ndarray,
     output_data: np.ndarray,
-    method: str = "fast",
+    method: str = 'fast',
     verbose: bool = False,
-) -> tuple["FOPDTModel", dict, "FOPDTIdentifier"]:
+) -> tuple[FOPDTModel, dict, FOPDTIdentifier]:
     """Identify FOPDT model parameters from a step response experiment.
 
     Parameters
@@ -362,7 +358,7 @@ def identify_fopdt(
     """
     identifier = FOPDTIdentifier(time, input_data, output_data, verbose=verbose)
 
-    if method == "two-point":
+    if method == 'two-point':
         model = identifier.identify_two_point()
     else:
         model = identifier.identify_optimization(method=method)
@@ -370,8 +366,8 @@ def identify_fopdt(
     metrics = identifier.calculate_fit_quality(model)
 
     if verbose:
-        print(f"\nFOPDT Model: {model}")
-        print(f"Fit Quality — R2: {metrics['R2']:.4f}, RMSE: {metrics['RMSE']:.4f}")
+        print(f'\nFOPDT Model: {model}')
+        print(f'Fit Quality — R2: {metrics["R2"]:.4f}, RMSE: {metrics["RMSE"]:.4f}')
 
     return model, metrics, identifier
 
@@ -384,7 +380,7 @@ def identify_fopdt(
 def plot_fopdt_fit(
     identifier: FOPDTIdentifier,
     model: FOPDTModel,
-    title: str = "FOPDT Model Identification",
+    title: str = 'FOPDT Model Identification',
 ):
     """Plot actual vs FOPDT model response with a residuals panel.
 
@@ -410,18 +406,18 @@ def plot_fopdt_fit(
     )
 
     # --- Response comparison ---
-    ax1.plot(identifier.time, identifier.output, "b-", linewidth=2, label="Actual")
-    ax1.plot(identifier.time, model_response, "r--", linewidth=2, label="FOPDT Model")
-    ax1.axvline(identifier.step_time, color="gray", linestyle=":", alpha=0.5)
+    ax1.plot(identifier.time, identifier.output, 'b-', linewidth=2, label='Actual')
+    ax1.plot(identifier.time, model_response, 'r--', linewidth=2, label='FOPDT Model')
+    ax1.axvline(identifier.step_time, color='gray', linestyle=':', alpha=0.5)
     ax1.axvline(
         identifier.step_time + model.t0,
-        color="orange",
-        linestyle=":",
+        color='orange',
+        linestyle=':',
         alpha=0.5,
-        label="Dead Time",
+        label='Dead Time',
     )
-    ax1.set_xlabel("Time (s)")
-    ax1.set_ylabel("Output")
+    ax1.set_xlabel('Time (s)')
+    ax1.set_ylabel('Output')
     # ax1.set_title(title)  # no title per publication style
     ax1.legend(frameon=False)
     ax1.grid(True, alpha=0.3)
@@ -429,11 +425,11 @@ def plot_fopdt_fit(
     # --- Residuals ---
     valid_mask = identifier.time > identifier.step_time
     residuals = identifier.output[valid_mask] - model_response[valid_mask]
-    ax2.plot(identifier.time[valid_mask], residuals, "g-", linewidth=1.5)
-    ax2.axhline(0, color="k", linestyle="--", alpha=0.3)
-    ax2.fill_between(identifier.time[valid_mask], residuals, alpha=0.3, color="green")
-    ax2.set_xlabel("Time (s)")
-    ax2.set_ylabel("Residual (Actual - Model)")
+    ax2.plot(identifier.time[valid_mask], residuals, 'g-', linewidth=1.5)
+    ax2.axhline(0, color='k', linestyle='--', alpha=0.3)
+    ax2.fill_between(identifier.time[valid_mask], residuals, alpha=0.3, color='green')
+    ax2.set_xlabel('Time (s)')
+    ax2.set_ylabel('Residual (Actual - Model)')
     # ax2.set_title("Fit Residuals")  # no title per publication style
     ax2.grid(True, alpha=0.3)
 

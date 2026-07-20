@@ -6,7 +6,6 @@ dx/dt = 0 for any plant model.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
 
 import control as ct
 import numpy as np
@@ -47,7 +46,7 @@ class OperatingPoint(ABC):
         """Return indices of outputs that are constrained during search."""
         pass
 
-    def find(self) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+    def find(self) -> tuple[np.ndarray, np.ndarray] | None:
         """Find the equilibrium operating point using ct.find_eqpt."""
         x_guess = self.get_initial_guess()
         u_steady = self.get_nominal_inputs()
@@ -84,20 +83,25 @@ def find_optimal_operating_point(
     x_guess: np.ndarray,
     input_indices: list[int],
     output_indices: list[int],
-) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+) -> tuple[np.ndarray, np.ndarray] | None:
     """General wrapper function for finding equilibrium operating points.
 
     Dynamically constructs a subclass of OperatingPoint to run the search.
     """
+
     class CustomFinder(OperatingPoint):
         def get_initial_guess(self) -> np.ndarray:
             return x_guess
+
         def get_nominal_inputs(self) -> np.ndarray:
             return u_steady
+
         def get_target_outputs(self) -> np.ndarray:
             return y_steady
+
         def get_input_indices(self) -> list[int]:
             return input_indices
+
         def get_output_indices(self) -> list[int]:
             return output_indices
 

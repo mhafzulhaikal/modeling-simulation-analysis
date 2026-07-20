@@ -60,10 +60,10 @@ from model.config import (
     PROCESS_PARAMS,
     SENSOR_TRANSMITTER_PARAMS,
     SETPOINT_PARAMS,
-    X0_NOMINAL,
-    X0_CLOSED_LOOP,
-    U_NOMINAL,
     TUNING_PARAMS,
+    U_NOMINAL,
+    X0_CLOSED_LOOP,
+    X0_NOMINAL,
 )
 from model.simsys import ClosedLoopSimulation, ControlLoop
 
@@ -71,23 +71,23 @@ from model.simsys import ClosedLoopSimulation, ControlLoop
 # Configuration
 # =============================================================================
 
-TIME_END  = 10000   # simulation horizon [s]
-TIME_STEP = 0.5     # output time step   [s]
-STEP_TIME = 600     # time of setpoint step [s]
+TIME_END = 10000  # simulation horizon [s]
+TIME_STEP = 0.5  # output time step   [s]
+STEP_TIME = 600  # time of setpoint step [s]
 
 # --- Setpoint nominal values (before step) ---
-NOM_LSP_100 = X0_NOMINAL["h"]
-NOM_TSP_100 = X0_NOMINAL["T"]
-NOM_FSP_100 = U_NOMINAL["f_oil"]
-NOM_FSP_101 = U_NOMINAL["f_MeOH"]
-NOM_FSP_102 = U_NOMINAL["f_NaOH"]
+NOM_LSP_100 = X0_NOMINAL['h']
+NOM_TSP_100 = X0_NOMINAL['T']
+NOM_FSP_100 = U_NOMINAL['f_oil']
+NOM_FSP_101 = U_NOMINAL['f_MeOH']
+NOM_FSP_102 = U_NOMINAL['f_NaOH']
 
 # --- Setpoint values after step ---
-SP_LSP_100 = X0_NOMINAL["h"]
-SP_TSP_100 = X0_NOMINAL["T"]
-SP_FSP_100 = U_NOMINAL["f_oil"]
-SP_FSP_101 = U_NOMINAL["f_MeOH"]
-SP_FSP_102 = U_NOMINAL["f_NaOH"]
+SP_LSP_100 = X0_NOMINAL['h']
+SP_TSP_100 = X0_NOMINAL['T']
+SP_FSP_100 = U_NOMINAL['f_oil']
+SP_FSP_101 = U_NOMINAL['f_MeOH']
+SP_FSP_102 = U_NOMINAL['f_NaOH']
 
 
 # =============================================================================
@@ -97,32 +97,32 @@ SP_FSP_102 = U_NOMINAL["f_NaOH"]
 plant = BiodieselPlant(**PROCESS_PARAMS)
 
 # Controllers
-LC_100 = ControllerSystem(**CONTROLLER_PARAMS["LIC-100"])
-TC_100 = ControllerSystem(**CONTROLLER_PARAMS["TIC-100"])
-FC_100 = ControllerSystem(**CONTROLLER_PARAMS["FIC-100"])
-FC_101 = ControllerSystem(**CONTROLLER_PARAMS["FIC-101"])
-FC_102 = ControllerSystem(**CONTROLLER_PARAMS["FIC-102"])
+LC_100 = ControllerSystem(**CONTROLLER_PARAMS['LIC-100'])
+TC_100 = ControllerSystem(**CONTROLLER_PARAMS['TIC-100'])
+FC_100 = ControllerSystem(**CONTROLLER_PARAMS['FIC-100'])
+FC_101 = ControllerSystem(**CONTROLLER_PARAMS['FIC-101'])
+FC_102 = ControllerSystem(**CONTROLLER_PARAMS['FIC-102'])
 
 # Setpoint stations
-LSP_100 = SetPointSystem(**SETPOINT_PARAMS["LIC-100"])
-TSP_100 = SetPointSystem(**SETPOINT_PARAMS["TIC-100"])
-FSP_100 = SetPointSystem(**SETPOINT_PARAMS["FIC-100"])
-FSP_101 = SetPointSystem(**SETPOINT_PARAMS["FIC-101"])
-FSP_102 = SetPointSystem(**SETPOINT_PARAMS["FIC-102"])
+LSP_100 = SetPointSystem(**SETPOINT_PARAMS['LIC-100'])
+TSP_100 = SetPointSystem(**SETPOINT_PARAMS['TIC-100'])
+FSP_100 = SetPointSystem(**SETPOINT_PARAMS['FIC-100'])
+FSP_101 = SetPointSystem(**SETPOINT_PARAMS['FIC-101'])
+FSP_102 = SetPointSystem(**SETPOINT_PARAMS['FIC-102'])
 
 # Actuators (control valves)
-LCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["LIC-100"])  # f_FAME
-TCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["TIC-100"])  # f_coolant
-FCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-100"])  # f_oil
-FCV_101 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-101"])  # f_MeOH
-FCV_102 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-102"])  # f_NaOH
+LCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['LIC-100'])  # f_FAME
+TCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['TIC-100'])  # f_coolant
+FCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-100'])  # f_oil
+FCV_101 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-101'])  # f_MeOH
+FCV_102 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-102'])  # f_NaOH
 
 # Sensor-transmitters
-LT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["LIC-100"])
-TT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["TIC-100"])
-FT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-100"])
-FT_101 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-101"])
-FT_102 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-102"])
+LT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['LIC-100'])
+TT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['TIC-100'])
+FT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-100'])
+FT_101 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-101'])
+FT_102 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-102'])
 
 
 # =============================================================================
@@ -135,9 +135,9 @@ FT_102 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-102"])
 loops = [
     # LIC-100 — Level control: h [m] via f_FAME (FAME outlet valve)
     ControlLoop(
-        mv="f_FAME",
-        pv="h",
-        pv_source="plant",
+        mv='f_FAME',
+        pv='h',
+        pv_source='plant',
         actuator=LCV_100,
         controller=LC_100,
         setpoint=LSP_100,
@@ -145,9 +145,9 @@ loops = [
     ),
     # TIC-100 — Temperature control: T [K] via f_coolant (cooling valve, FO)
     ControlLoop(
-        mv="f_coolant",
-        pv="T",
-        pv_source="plant",
+        mv='f_coolant',
+        pv='T',
+        pv_source='plant',
         actuator=TCV_100,
         controller=TC_100,
         setpoint=TSP_100,
@@ -155,9 +155,9 @@ loops = [
     ),
     # FIC-100 — Oil flow control: FCV-100 outlet flow via FT-100
     ControlLoop(
-        mv="f_oil",
-        pv="F",
-        pv_source="actuator",
+        mv='f_oil',
+        pv='F',
+        pv_source='actuator',
         actuator=FCV_100,
         controller=FC_100,
         setpoint=FSP_100,
@@ -165,9 +165,9 @@ loops = [
     ),
     # FIC-101 — MeOH flow control: FCV-101 outlet flow via FT-101
     ControlLoop(
-        mv="f_MeOH",
-        pv="F",
-        pv_source="actuator",
+        mv='f_MeOH',
+        pv='F',
+        pv_source='actuator',
         actuator=FCV_101,
         controller=FC_101,
         setpoint=FSP_101,
@@ -175,9 +175,9 @@ loops = [
     ),
     # FIC-102 — NaOH flow control: FCV-102 outlet flow via FT-102
     ControlLoop(
-        mv="f_NaOH",
-        pv="F",
-        pv_source="actuator",
+        mv='f_NaOH',
+        pv='F',
+        pv_source='actuator',
         actuator=FCV_102,
         controller=FC_102,
         setpoint=FSP_102,
@@ -189,9 +189,9 @@ sim = ClosedLoopSimulation(plant, loops)
 
 # Inspect signal layout before building U and X0
 print(sim)
-print("Input names :", sim.input_names)
-print("State names :", sim.state_names)
-print("Output names:", sim.output_names)
+print('Input names :', sim.input_names)
+print('State names :', sim.state_names)
+print('Output names:', sim.output_names)
 
 
 # =============================================================================
@@ -221,28 +221,34 @@ time = np.arange(0, TIME_END + TIME_STEP, TIME_STEP)
 
 # --- Setpoint profiles ---
 SP_profiles = {
-    "SP_LC_100": np.full_like(time, NOM_LSP_100),
-    "SP_TC_100": np.full_like(time, NOM_TSP_100),
-    "SP_FC_100": np.full_like(time, NOM_FSP_100),
-    "SP_FC_101": np.full_like(time, NOM_FSP_101),
-    "SP_FC_102": np.full_like(time, NOM_FSP_102),
+    'SP_LC_100': np.full_like(time, NOM_LSP_100),
+    'SP_TC_100': np.full_like(time, NOM_TSP_100),
+    'SP_FC_100': np.full_like(time, NOM_FSP_100),
+    'SP_FC_101': np.full_like(time, NOM_FSP_101),
+    'SP_FC_102': np.full_like(time, NOM_FSP_102),
 }
-SP_profiles["SP_LC_100"][time >= STEP_TIME] = SP_LSP_100
-SP_profiles["SP_TC_100"][time >= STEP_TIME] = SP_TSP_100
-SP_profiles["SP_FC_100"][time >= STEP_TIME] = SP_FSP_100
-SP_profiles["SP_FC_101"][time >= STEP_TIME] = SP_FSP_101
-SP_profiles["SP_FC_102"][time >= STEP_TIME] = SP_FSP_102
+SP_profiles['SP_LC_100'][time >= STEP_TIME] = SP_LSP_100
+SP_profiles['SP_TC_100'][time >= STEP_TIME] = SP_TSP_100
+SP_profiles['SP_FC_100'][time >= STEP_TIME] = SP_FSP_100
+SP_profiles['SP_FC_101'][time >= STEP_TIME] = SP_FSP_101
+SP_profiles['SP_FC_102'][time >= STEP_TIME] = SP_FSP_102
 
 # --- Disturbance profiles ---
-U_disturbances = {k: np.full_like(time, v) for k, v in U_NOMINAL.items() if not k.startswith("f_")}
+U_disturbances = {k: np.full_like(time, v) for k, v in U_NOMINAL.items() if not k.startswith('f_')}
 
 # --- PID tuning profiles (constant → fixed gains) ---
 tuning_profiles = {}
-for loop_id, strategy in [("LIC-100", "Tight"), ("TIC-100", "QDR"), ("FIC-100", None), ("FIC-101", None), ("FIC-102", None)]:
+for loop_id, strategy in [
+    ('LIC-100', 'Tight'),
+    ('TIC-100', 'QDR'),
+    ('FIC-100', None),
+    ('FIC-101', None),
+    ('FIC-102', None),
+]:
     p = TUNING_PARAMS[loop_id][strategy] if strategy else TUNING_PARAMS[loop_id]
-    tag = loop_id.replace("I", "").replace("-", "_")  # e.g., 'LC_100'
-    for key in ["Kc", "tauI", "tauD"]:
-        tuning_profiles[f"{key}_{tag}"] = np.full_like(time, p[key])
+    tag = loop_id.replace('I', '').replace('-', '_')  # e.g., 'LC_100'
+    for key in ['Kc', 'tauI', 'tauD']:
+        tuning_profiles[f'{key}_{tag}'] = np.full_like(time, p[key])
 
 # Build U — named inputs map to sim.input_names automatically
 # Input keys for tuning/SP follow the pattern SP_{ctrl_tag}, Kc_{ctrl_tag}, ...
@@ -307,19 +313,19 @@ print(result)
 fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
 
 # Top: measurement vs setpoint
-axes[0].plot(time, result["TT_100.C"], label="TT-100 (%TO)")
-axes[0].plot(time, result["TSP_100.R"], label="TSP-100 SP (%TO)", linestyle="--")
-axes[0].axvline(STEP_TIME, color="gray", linestyle=":", alpha=0.5)
-axes[0].set_ylabel("Signal (%TO)")
+axes[0].plot(time, result['TT_100.C'], label='TT-100 (%TO)')
+axes[0].plot(time, result['TSP_100.R'], label='TSP-100 SP (%TO)', linestyle='--')
+axes[0].axvline(STEP_TIME, color='gray', linestyle=':', alpha=0.5)
+axes[0].set_ylabel('Signal (%TO)')
 # axes[0].set_title("TIC-100 Closed-Loop Step Response")  # no title per publication style
 axes[0].legend(frameon=False)
 axes[0].grid(True, alpha=0.3)
 
 # Bottom: controller output
-axes[1].plot(time, result["TC_100.M"], label="TC-100 M (%CO)", color="tab:orange")
-axes[1].axvline(STEP_TIME, color="gray", linestyle=":", alpha=0.5)
-axes[1].set_xlabel("Time (s)")
-axes[1].set_ylabel("Controller Output (%CO)")
+axes[1].plot(time, result['TC_100.M'], label='TC-100 M (%CO)', color='tab:orange')
+axes[1].axvline(STEP_TIME, color='gray', linestyle=':', alpha=0.5)
+axes[1].set_xlabel('Time (s)')
+axes[1].set_ylabel('Controller Output (%CO)')
 axes[1].legend(frameon=False)
 axes[1].grid(True, alpha=0.3)
 

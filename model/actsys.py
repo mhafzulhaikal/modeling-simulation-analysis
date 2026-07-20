@@ -74,12 +74,12 @@ class ActuatorSystem(ControlElement):
     >>> act.system   # ct.NonlinearIOSystem object
     """
 
-    STATE_NAMES = ["vp"]
-    INPUT_NAMES = ["M"]
-    OUTPUT_NAMES = ["F"]
+    STATE_NAMES = ['vp']
+    INPUT_NAMES = ['M']
+    OUTPUT_NAMES = ['F']
 
-    VALVE_TYPES = ("linear", "equal_percentage", "quick_opening")
-    VALVE_ACTIONS = ("FC", "FO")
+    VALVE_TYPES = ('linear', 'equal_percentage', 'quick_opening')
+    VALVE_ACTIONS = ('FC', 'FO')
 
     def __init__(
         self,
@@ -88,33 +88,30 @@ class ActuatorSystem(ControlElement):
         f_max: float,
         vp_min: float = 0.0,
         vp_max: float = 100.0,
-        valve_type: str = "linear",
-        valve_action: str = "FC",
+        valve_type: str = 'linear',
+        valve_action: str = 'FC',
     ) -> None:
         if valve_type not in self.VALVE_TYPES:
-            raise ValueError(
-                f"valve_type must be one of {self.VALVE_TYPES}, got '{valve_type}'."
-            )
+            raise ValueError(f"valve_type must be one of {self.VALVE_TYPES}, got '{valve_type}'.")
         if valve_action not in self.VALVE_ACTIONS:
             raise ValueError(
-                f"valve_action must be one of {self.VALVE_ACTIONS}, "
-                f"got '{valve_action}'."
+                f"valve_action must be one of {self.VALVE_ACTIONS}, got '{valve_action}'."
             )
         if tauV < 0:
-            raise ValueError(f"tauV must be >= 0, got {tauV}.")
+            raise ValueError(f'tauV must be >= 0, got {tauV}.')
         if f_max <= 0:
-            raise ValueError(f"f_max must be > 0, got {f_max}.")
+            raise ValueError(f'f_max must be > 0, got {f_max}.')
         if vp_min >= vp_max:
-            raise ValueError(f"vp_min ({vp_min}) must be less than vp_max ({vp_max}).")
+            raise ValueError(f'vp_min ({vp_min}) must be less than vp_max ({vp_max}).')
 
         self.params = {
-            "name": str(name),
-            "tauV": float(tauV),
-            "f_max": float(f_max),
-            "vp_min": float(vp_min),
-            "vp_max": float(vp_max),
-            "valve_type": str(valve_type),
-            "valve_action": str(valve_action),
+            'name': str(name),
+            'tauV': float(tauV),
+            'f_max': float(f_max),
+            'vp_min': float(vp_min),
+            'vp_max': float(vp_max),
+            'valve_type': str(valve_type),
+            'valve_action': str(valve_action),
         }
         super().__init__()
 
@@ -137,12 +134,12 @@ class ActuatorSystem(ControlElement):
             Normalized flow [%] in range [0, 100].
         """
         vp = float(vp)
-        if valve_type == "linear":
+        if valve_type == 'linear':
             return vp
-        if valve_type == "equal_percentage":
+        if valve_type == 'equal_percentage':
             # Rangeability R=50: flow = R^(vp/100 - 1) * 100
             return 100.0 * (50.0 ** (0.01 * vp - 1.0))
-        if valve_type == "quick_opening":
+        if valve_type == 'quick_opening':
             return 100.0 * np.sqrt(0.01 * vp)
         raise ValueError(f"Unknown valve_type: '{valve_type}'.")
 
@@ -177,13 +174,13 @@ class ActuatorSystem(ControlElement):
         """
         vp = float(x[0])
         M = float(u[0])
-        tauV = float(params["tauV"])
+        tauV = float(params['tauV'])
 
         if tauV <= 0.0:
             # Instantaneous valve: treat as algebraic (no dynamics).
             return [0.0]
 
-        if params["valve_action"] == "FC":
+        if params['valve_action'] == 'FC':
             dvp_dt = (M - vp) / tauV
         else:  # FO — fail-open: signal drives valve toward (100 - M)
             dvp_dt = ((100.0 - M) - vp) / tauV
@@ -216,8 +213,8 @@ class ActuatorSystem(ControlElement):
             Output [F] — volumetric flow rate [m³/s].
         """
         vp = float(x[0]) if x is not None and len(x) > 0 else 0.0
-        vp_clamped = np.clip(vp, params["vp_min"], params["vp_max"])
-        flow_pct = self._valve_characteristic(vp_clamped, params["valve_type"])
-        F = (flow_pct / 100.0) * params["f_max"]
+        vp_clamped = np.clip(vp, params['vp_min'], params['vp_max'])
+        flow_pct = self._valve_characteristic(vp_clamped, params['valve_type'])
+        F = (flow_pct / 100.0) * params['f_max']
 
         return [F]

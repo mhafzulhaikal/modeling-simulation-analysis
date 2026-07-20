@@ -87,45 +87,41 @@ class ControllerSystem(ControlElement):
     >>> ctrl.system   # ct.NonlinearIOSystem object
     """
 
-    STATE_NAMES = ["I_state", "D_state"]
-    INPUT_NAMES = ["R", "C", "Kc", "tauI", "tauD"]
-    OUTPUT_NAMES = ["M"]
+    STATE_NAMES = ['I_state', 'D_state']
+    INPUT_NAMES = ['R', 'C', 'Kc', 'tauI', 'tauD']
+    OUTPUT_NAMES = ['M']
 
     ALPHA_DERIVATIVE_FILTER = 0.125  # tauF = Alpha * tauD
     OUTPUT_MIN = 0.0  # lower output saturation limit [%]
     OUTPUT_MAX = 100.0  # upper output saturation limit [%]
     MODE_THRESHOLD = 1e-12  # tauI/tauD values below this → zero
 
-    VALID_MODES = ("AUTO", "P", "PI", "PD", "PID")
-    VALID_ACTIONS = ("DIRECT", "REVERSE")
+    VALID_MODES = ('AUTO', 'P', 'PI', 'PD', 'PID')
+    VALID_ACTIONS = ('DIRECT', 'REVERSE')
 
     def __init__(
         self,
-        name: str = "ControllerSystem",
+        name: str = 'ControllerSystem',
         bias: float | None = None,
-        mode: str = "AUTO",
-        acting: str = "REVERSE",
+        mode: str = 'AUTO',
+        acting: str = 'REVERSE',
     ) -> None:
         if mode not in self.VALID_MODES:
             raise ValueError(f"mode must be one of {self.VALID_MODES}, got '{mode}'.")
         if acting not in self.VALID_ACTIONS:
-            raise ValueError(
-                f"acting must be one of {self.VALID_ACTIONS}, got '{acting}'."
-            )
+            raise ValueError(f"acting must be one of {self.VALID_ACTIONS}, got '{acting}'.")
         bias = 50.0 if bias is None else float(bias)
         if not (self.OUTPUT_MIN <= bias <= self.OUTPUT_MAX):
-            raise ValueError(
-                f"bias must be in [{self.OUTPUT_MIN}, {self.OUTPUT_MAX}], got {bias}."
-            )
+            raise ValueError(f'bias must be in [{self.OUTPUT_MIN}, {self.OUTPUT_MAX}], got {bias}.')
 
         self.params = {
-            "name": str(name),
-            "bias": bias,
-            "mode": str(mode),
-            "acting": str(acting),
-            "Alpha": float(self.ALPHA_DERIVATIVE_FILTER),
-            "M_min": float(self.OUTPUT_MIN),
-            "M_max": float(self.OUTPUT_MAX),
+            'name': str(name),
+            'bias': bias,
+            'mode': str(mode),
+            'acting': str(acting),
+            'Alpha': float(self.ALPHA_DERIVATIVE_FILTER),
+            'M_min': float(self.OUTPUT_MIN),
+            'M_max': float(self.OUTPUT_MAX),
         }
         super().__init__()
 
@@ -150,20 +146,20 @@ class ControllerSystem(ControlElement):
         str
             One of ``'P'``, ``'PI'``, ``'PD'``, ``'PID'``.
         """
-        forced = params["mode"]
-        if forced != "AUTO":
+        forced = params['mode']
+        if forced != 'AUTO':
             return forced
 
         has_I = float(tauI) > ControllerSystem.MODE_THRESHOLD
         has_D = float(tauD) > ControllerSystem.MODE_THRESHOLD
 
         if has_I and has_D:
-            return "PID"
+            return 'PID'
         if has_I:
-            return "PI"
+            return 'PI'
         if has_D:
-            return "PD"
-        return "P"
+            return 'PD'
+        return 'P'
 
     # --- Individual control laws (pure functions for testability) ------------
     #
@@ -185,9 +181,9 @@ class ControllerSystem(ControlElement):
             Both state derivatives are zero; M_sat is the saturated output.
         """
         error = float(R) - float(C)
-        Kc_eff = float(Kc) if params["acting"] == "REVERSE" else -float(Kc)
-        M_unsat = params["bias"] + Kc_eff * error
-        M_sat = float(np.clip(M_unsat, params["M_min"], params["M_max"]))
+        Kc_eff = float(Kc) if params['acting'] == 'REVERSE' else -float(Kc)
+        M_unsat = params['bias'] + Kc_eff * error
+        M_sat = float(np.clip(M_unsat, params['M_min'], params['M_max']))
         return 0.0, 0.0, M_sat
 
     @staticmethod
@@ -210,9 +206,9 @@ class ControllerSystem(ControlElement):
         dI_state, dD_state, M_sat : float
         """
         error = float(R) - float(C)
-        Kc_eff = float(Kc) if params["acting"] == "REVERSE" else -float(Kc)
+        Kc_eff = float(Kc) if params['acting'] == 'REVERSE' else -float(Kc)
         M_unsat = Kc_eff * error + float(I_state)
-        M_sat = float(np.clip(M_unsat, params["M_min"], params["M_max"]))
+        M_sat = float(np.clip(M_unsat, params['M_min'], params['M_max']))
 
         # Back-calculation: dI/dt = Kc/tauI * e + (M_sat - M_unsat) / tauI
         dI_state = (Kc_eff / float(tauI)) * error + (M_sat - M_unsat) / float(tauI)
@@ -236,11 +232,11 @@ class ControllerSystem(ControlElement):
         dI_state, dD_state, M_sat : float
         """
         diff = float(C) - float(D_state)
-        U_d = diff / params["Alpha"]  # filtered derivative term
+        U_d = diff / params['Alpha']  # filtered derivative term
         dD_state = U_d / float(tauD)  # filter state derivative
 
         M_unsat = float(C) + U_d
-        M_sat = float(np.clip(M_unsat, params["M_min"], params["M_max"]))
+        M_sat = float(np.clip(M_unsat, params['M_min'], params['M_max']))
         return 0.0, dD_state, M_sat
 
     @staticmethod
@@ -263,11 +259,11 @@ class ControllerSystem(ControlElement):
         -------
         dI_state, dD_state, M_sat : float
         """
-        Kc_eff = float(Kc) if params["acting"] == "REVERSE" else -float(Kc)
+        Kc_eff = float(Kc) if params['acting'] == 'REVERSE' else -float(Kc)
 
         # Derivative-on-PV: filter (C - D_state) through 1st-order lag
         diff = float(C) - float(D_state)
-        U_d = diff / params["Alpha"]
+        U_d = diff / params['Alpha']
         dD_state = U_d / float(tauD)
 
         # Filtered measurement seen by the proportional + integral terms
@@ -275,7 +271,7 @@ class ControllerSystem(ControlElement):
         error = float(R) - C_filt
 
         M_unsat = Kc_eff * error + float(I_state)
-        M_sat = float(np.clip(M_unsat, params["M_min"], params["M_max"]))
+        M_sat = float(np.clip(M_unsat, params['M_min'], params['M_max']))
 
         # Back-calculation anti-windup
         dI_state = (Kc_eff / float(tauI)) * error + (M_sat - M_unsat) / float(tauI)
@@ -314,16 +310,14 @@ class ControllerSystem(ControlElement):
 
         mode = self._resolve_mode(tauI, tauD, params)
 
-        if mode == "P":
+        if mode == 'P':
             dI, dD, _ = self._P_controller(R, C, Kc, params)
-        elif mode == "PI":
+        elif mode == 'PI':
             dI, dD, _ = self._PI_controller(R, C, Kc, tauI, I_state, params)
-        elif mode == "PD":
+        elif mode == 'PD':
             dI, dD, _ = self._PD_controller(R, C, tauD, D_state, params)
         else:  # PID
-            dI, dD, _ = self._PID_controller(
-                R, C, Kc, tauI, tauD, I_state, D_state, params
-            )
+            dI, dD, _ = self._PID_controller(R, C, Kc, tauI, tauD, I_state, D_state, params)
 
         return [dI, dD]
 
@@ -357,15 +351,13 @@ class ControllerSystem(ControlElement):
 
         mode = self._resolve_mode(tauI, tauD, params)
 
-        if mode == "P":
+        if mode == 'P':
             _, _, M = self._P_controller(R, C, Kc, params)
-        elif mode == "PI":
+        elif mode == 'PI':
             _, _, M = self._PI_controller(R, C, Kc, tauI, I_state, params)
-        elif mode == "PD":
+        elif mode == 'PD':
             _, _, M = self._PD_controller(R, C, tauD, D_state, params)
         else:  # PID
-            _, _, M = self._PID_controller(
-                R, C, Kc, tauI, tauD, I_state, D_state, params
-            )
+            _, _, M = self._PID_controller(R, C, Kc, tauI, tauD, I_state, D_state, params)
 
         return [M]

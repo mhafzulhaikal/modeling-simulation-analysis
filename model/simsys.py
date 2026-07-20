@@ -136,17 +136,13 @@ class SimResult:
     def get_output(self, name: str) -> np.ndarray:
         """Return time trajectory of an output signal by name."""
         if name not in self.output_names:
-            raise KeyError(
-                f"Output '{name}' not found.\n  Available: {self.output_names}"
-            )
+            raise KeyError(f"Output '{name}' not found.\n  Available: {self.output_names}")
         return self.y[self.output_names.index(name)]
 
     def get_state(self, name: str) -> np.ndarray:
         """Return time trajectory of a state by name."""
         if name not in self.state_names:
-            raise KeyError(
-                f"State '{name}' not found.\n  Available: {self.state_names}"
-            )
+            raise KeyError(f"State '{name}' not found.\n  Available: {self.state_names}")
         return self.x[self.state_names.index(name)]
 
     def __getitem__(self, name: str) -> np.ndarray:
@@ -157,18 +153,18 @@ class SimResult:
             return self.get_state(name)
         raise KeyError(
             f"Signal '{name}' not found.\n"
-            f"  Outputs : {self.output_names}\n"
-            f"  States  : {self.state_names}"
+            f'  Outputs : {self.output_names}\n'
+            f'  States  : {self.state_names}'
         )
 
     def __repr__(self) -> str:
         return (
-            f"SimResult("
+            f'SimResult('
             f"type='{self.simulation_type}', "
-            f"t=[{self.t[0]:.1f}, {self.t[-1]:.1f}] s, "
-            f"steps={len(self.t)}, "
-            f"states={len(self.state_names)}, "
-            f"outputs={len(self.output_names)})"
+            f't=[{self.t[0]:.1f}, {self.t[-1]:.1f}] s, '
+            f'steps={len(self.t)}, '
+            f'states={len(self.state_names)}, '
+            f'outputs={len(self.output_names)})'
         )
 
 
@@ -235,30 +231,30 @@ class ControlLoop:
     controller: ControllerSystem
     setpoint: SetPointSystem
     sensor: SensorTransmitterSystem
-    pv_source: str = "plant"  # 'plant' or 'actuator'
+    pv_source: str = 'plant'  # 'plant' or 'actuator'
 
-    _VALID_PV_SOURCES = ("plant", "actuator")
+    _VALID_PV_SOURCES = ('plant', 'actuator')
 
     def __post_init__(self) -> None:
         if self.pv_source not in self._VALID_PV_SOURCES:
             raise ValueError(
-                f"ControlLoop.pv_source must be one of {self._VALID_PV_SOURCES}, "
+                f'ControlLoop.pv_source must be one of {self._VALID_PV_SOURCES}, '
                 f"got '{self.pv_source}'."
             )
         _check = [
-            ("actuator", self.actuator, "F", "OUTPUT_NAMES"),
-            ("actuator", self.actuator, "M", "INPUT_NAMES"),
-            ("controller", self.controller, "M", "OUTPUT_NAMES"),
-            ("controller", self.controller, "R", "INPUT_NAMES"),
-            ("controller", self.controller, "C", "INPUT_NAMES"),
-            ("setpoint", self.setpoint, "R", "OUTPUT_NAMES"),
-            ("sensor", self.sensor, "C", "OUTPUT_NAMES"),
-            ("sensor", self.sensor, "PV", "INPUT_NAMES"),
+            ('actuator', self.actuator, 'F', 'OUTPUT_NAMES'),
+            ('actuator', self.actuator, 'M', 'INPUT_NAMES'),
+            ('controller', self.controller, 'M', 'OUTPUT_NAMES'),
+            ('controller', self.controller, 'R', 'INPUT_NAMES'),
+            ('controller', self.controller, 'C', 'INPUT_NAMES'),
+            ('setpoint', self.setpoint, 'R', 'OUTPUT_NAMES'),
+            ('sensor', self.sensor, 'C', 'OUTPUT_NAMES'),
+            ('sensor', self.sensor, 'PV', 'INPUT_NAMES'),
         ]
         for role, elem, port, attr in _check:
             if port not in getattr(elem, attr):
                 raise ValueError(
-                    f"ControlLoop: {role} ({type(elem).__name__}) must have "
+                    f'ControlLoop: {role} ({type(elem).__name__}) must have '
                     f"port '{port}' in {attr}."
                 )
 
@@ -406,9 +402,7 @@ class ProcessSimulation(ABC):
         U = np.zeros((len(self.input_names), n_steps))
         for name, val in kwargs.items():
             if name not in self.input_names:
-                raise KeyError(
-                    f"Input '{name}' not found.\n  Available: {self.input_names}"
-                )
+                raise KeyError(f"Input '{name}' not found.\n  Available: {self.input_names}")
             idx = self.input_names.index(name)
             if np.isscalar(val):
                 U[idx, :] = float(val)  # type: ignore
@@ -427,7 +421,7 @@ class ProcessSimulation(ABC):
         U: np.ndarray,
         X0: np.ndarray,
         *,
-        method: str = "LSODA",
+        method: str = 'LSODA',
         **kwargs,
     ) -> SimResult:
         """Run the simulation and return a self-documenting ``SimResult``.
@@ -457,7 +451,7 @@ class ProcessSimulation(ABC):
             T,
             U,  # type: ignore
             X0,  # type: ignore
-            solve_ivp_kwargs={"method": method},
+            solve_ivp_kwargs={'method': method},
             **kwargs,
         )
         return SimResult(
@@ -470,11 +464,11 @@ class ProcessSimulation(ABC):
 
     def __repr__(self) -> str:
         return (
-            f"{type(self).__name__}("
-            f"plant={type(self.plant).__name__}, "
-            f"inputs={len(self.input_names)}, "
-            f"states={len(self.state_names)}, "
-            f"outputs={len(self.output_names)})"
+            f'{type(self).__name__}('
+            f'plant={type(self.plant).__name__}, '
+            f'inputs={len(self.input_names)}, '
+            f'states={len(self.state_names)}, '
+            f'outputs={len(self.output_names)})'
         )
 
     # --- Internal helpers ----------------------------------------------------
@@ -488,7 +482,7 @@ class ProcessSimulation(ABC):
         short_matches = [
             i
             for i, s in enumerate(self.state_names)
-            if (s.rsplit(".", 1)[-1] if "." in s else s) == name
+            if (s.rsplit('.', 1)[-1] if '.' in s else s) == name
         ]
         if len(short_matches) == 1:
             return short_matches[0]
@@ -508,7 +502,7 @@ class ProcessSimulation(ABC):
             if sys.name in seen:
                 raise ValueError(
                     f"{context}: duplicate system name '{sys.name}'. "
-                    "Each instrument element must have a unique name tag."
+                    'Each instrument element must have a unique name tag.'
                 )
             seen[sys.name] = sys.name
 
@@ -551,7 +545,7 @@ class DynamicSimulation(ProcessSimulation):
 
     @property
     def simulation_type(self) -> str:
-        return "dynamic"
+        return 'dynamic'
 
     def _build_system(self) -> ct.NonlinearIOSystem:
         return self.plant.system  # no assembly needed
@@ -629,25 +623,25 @@ class OpenLoopSimulation(ProcessSimulation):
             if mv not in plant.INPUT_NAMES:
                 raise ValueError(
                     f"OpenLoopSimulation: actuator key '{mv}' is not in "
-                    f"plant.INPUT_NAMES.\n  Available: {plant.INPUT_NAMES}"
+                    f'plant.INPUT_NAMES.\n  Available: {plant.INPUT_NAMES}'
                 )
         self.actuators: dict[str, ActuatorSystem] = dict(actuators)
-        
+
         self.sensors: dict[str, SensorTransmitterSystem] = {}
         if sensors:
             for pv in sensors:
                 if pv not in plant.STATE_NAMES and pv not in self.actuators:
                     raise ValueError(
                         f"OpenLoopSimulation: sensor key '{pv}' must be a plant state "
-                        f"or an active actuator key."
+                        f'or an active actuator key.'
                     )
             self.sensors = dict(sensors)
-            
+
         super().__init__(plant)
 
     @property
     def simulation_type(self) -> str:
-        return "open_loop"
+        return 'open_loop'
 
     # --- Signal layout -------------------------------------------------------
 
@@ -659,57 +653,60 @@ class OpenLoopSimulation(ProcessSimulation):
     @property
     def input_names(self) -> list[str]:
         disturbances = self._disturbance_names
-        M_signals = [f"M_{mv}" for mv in self.actuators]
+        M_signals = [f'M_{mv}' for mv in self.actuators]
         return disturbances + M_signals
 
     @property
     def output_names(self) -> list[str]:
         names = list(self.plant.STATE_NAMES)
         for sns in self.sensors.values():
-            names.append(f"{sns.system.name}.C")
+            names.append(f'{sns.system.name}.C')
         return names
 
     @property
     def state_names(self) -> list[str]:
         # Plant states first (no prefix), then actuator states, then sensor states
         plant_states = list(self.plant.STATE_NAMES)
-        act_states = [f"{act.system.name}.vp" for act in self.actuators.values()]
+        act_states = [f'{act.system.name}.vp' for act in self.actuators.values()]
         sns_states = []
         for sns in self.sensors.values():
             for s in sns.STATE_NAMES:
-                sns_states.append(f"{sns.system.name}.{s}")
+                sns_states.append(f'{sns.system.name}.{s}')
         return plant_states + act_states + sns_states
 
     # --- System assembly -----------------------------------------------------
 
     def _build_system(self) -> ct.NonlinearIOSystem:
-        syslist = [self.plant.system] + [act.system for act in self.actuators.values()] + [sns.system for sns in self.sensors.values()]
-        self._validate_unique_names(syslist, "OpenLoopSimulation")
+        syslist = (
+            [self.plant.system]
+            + [act.system for act in self.actuators.values()]
+            + [sns.system for sns in self.sensors.values()]
+        )
+        self._validate_unique_names(syslist, 'OpenLoopSimulation')
 
         plt = self.plant.system.name
 
         # Wire: plant.mv input ← actuator.F output
         connections = [
-            [f"{plt}.{mv}", f"{act.system.name}.F"]
-            for mv, act in self.actuators.items()
+            [f'{plt}.{mv}', f'{act.system.name}.F'] for mv, act in self.actuators.items()
         ]
-        
+
         # Wire: sensor.pv input ← plant output or actuator output
         for pv, sns in self.sensors.items():
             if pv in self.plant.STATE_NAMES:
-                connections.append([f"{sns.system.name}.PV", f"{plt}.{pv}"])
+                connections.append([f'{sns.system.name}.PV', f'{plt}.{pv}'])
             elif pv in self.actuators:
                 act = self.actuators[pv]
-                connections.append([f"{sns.system.name}.PV", f"{act.system.name}.F"])
+                connections.append([f'{sns.system.name}.PV', f'{act.system.name}.F'])
 
         # External inputs: disturbances (direct to plant) + M signals to actuators
-        inplist = [f"{plt}.{d}" for d in self._disturbance_names] + [
-            f"{act.system.name}.M" for act in self.actuators.values()
+        inplist = [f'{plt}.{d}' for d in self._disturbance_names] + [
+            f'{act.system.name}.M' for act in self.actuators.values()
         ]
 
         # External outputs: all plant states + sensor outputs
-        outlist = [f"{plt}.{s}" for s in self.plant.STATE_NAMES] + [
-            f"{sns.system.name}.C" for sns in self.sensors.values()
+        outlist = [f'{plt}.{s}' for s in self.plant.STATE_NAMES] + [
+            f'{sns.system.name}.C' for sns in self.sensors.values()
         ]
 
         return ct.interconnect(
@@ -717,7 +714,7 @@ class OpenLoopSimulation(ProcessSimulation):
             connections=connections,
             inplist=inplist,
             outlist=outlist,
-            name="open_loop",
+            name='open_loop',
         )
 
 
@@ -794,16 +791,16 @@ class ClosedLoopSimulation(ProcessSimulation):
         for i, lp in enumerate(loops):
             if lp.mv not in plant.INPUT_NAMES:
                 raise ValueError(
-                    f"ClosedLoopSimulation loop[{i}] ({lp.tag}): "
+                    f'ClosedLoopSimulation loop[{i}] ({lp.tag}): '
                     f"mv='{lp.mv}' is not in plant.INPUT_NAMES.\n"
-                    f"  Available: {plant.INPUT_NAMES}"
+                    f'  Available: {plant.INPUT_NAMES}'
                 )
-            if lp.pv_source == "plant" and lp.pv not in plant.STATE_NAMES:
+            if lp.pv_source == 'plant' and lp.pv not in plant.STATE_NAMES:
                 raise ValueError(
-                    f"ClosedLoopSimulation loop[{i}] ({lp.tag}): "
+                    f'ClosedLoopSimulation loop[{i}] ({lp.tag}): '
                     f"pv='{lp.pv}' is not in plant.STATE_NAMES.\n"
-                    f"  Available: {plant.STATE_NAMES}\n"
-                    f"  Tip: for flow control loops that measure actuator output,"
+                    f'  Available: {plant.STATE_NAMES}\n'
+                    f'  Tip: for flow control loops that measure actuator output,'
                     f" set pv_source='actuator'."
                 )
         self.loops: list[ControlLoop] = list(loops)
@@ -811,7 +808,7 @@ class ClosedLoopSimulation(ProcessSimulation):
 
     @property
     def simulation_type(self) -> str:
-        return "closed_loop"
+        return 'closed_loop'
 
     # --- Signal layout -------------------------------------------------------
 
@@ -822,9 +819,7 @@ class ClosedLoopSimulation(ProcessSimulation):
     @property
     def _disturbance_names(self) -> list[str]:
         """Plant inputs not driven by any ControlLoop actuator."""
-        return [
-            inp for inp in self.plant.INPUT_NAMES if inp not in self._controlled_mvs
-        ]
+        return [inp for inp in self.plant.INPUT_NAMES if inp not in self._controlled_mvs]
 
     @property
     def input_names(self) -> list[str]:
@@ -834,7 +829,7 @@ class ClosedLoopSimulation(ProcessSimulation):
         names = list(self._disturbance_names)
         for lp in self.loops:
             tag = lp.tag  # e.g., 'LC_100', 'FC_100'
-            names += [f"SP_{tag}", f"Kc_{tag}", f"tauI_{tag}", f"tauD_{tag}"]
+            names += [f'SP_{tag}', f'Kc_{tag}', f'tauI_{tag}', f'tauD_{tag}']
         return names
 
     @property
@@ -843,9 +838,9 @@ class ClosedLoopSimulation(ProcessSimulation):
         names = list(self.plant.STATE_NAMES)
         for lp in self.loops:
             names += [
-                f"{lp.controller.system.name}.M",  # controller output
-                f"{lp.setpoint.system.name}.R",  # normalized setpoint
-                f"{lp.sensor.system.name}.C",  # normalized measurement
+                f'{lp.controller.system.name}.M',  # controller output
+                f'{lp.setpoint.system.name}.R',  # normalized setpoint
+                f'{lp.sensor.system.name}.C',  # normalized measurement
             ]
         return names
 
@@ -856,14 +851,14 @@ class ClosedLoopSimulation(ProcessSimulation):
         for lp in self.loops:
             # Sensor: 1 state (PVm) only if tauT > 0; static sensor has none
             for s in lp.sensor.STATE_NAMES:
-                names.append(f"{lp.sensor.system.name}.{s}")
+                names.append(f'{lp.sensor.system.name}.{s}')
             # Controller: 2 states (I_state, D_state)
             for s in lp.controller.STATE_NAMES:
-                names.append(f"{lp.controller.system.name}.{s}")
+                names.append(f'{lp.controller.system.name}.{s}')
             # Setpoint: 0 states (static element — nothing to add)
             # Actuator: 1 state (vp)
             for s in lp.actuator.STATE_NAMES:
-                names.append(f"{lp.actuator.system.name}.{s}")
+                names.append(f'{lp.actuator.system.name}.{s}')
         return names
 
     # --- System assembly -----------------------------------------------------
@@ -879,7 +874,7 @@ class ClosedLoopSimulation(ProcessSimulation):
                 lp.setpoint.system,
                 lp.actuator.system,
             ]
-        self._validate_unique_names(syslist, "ClosedLoopSimulation")
+        self._validate_unique_names(syslist, 'ClosedLoopSimulation')
 
         plt = self.plant.system.name
 
@@ -894,41 +889,41 @@ class ClosedLoopSimulation(ProcessSimulation):
             st = lp.sensor.system.name
 
             connections += [
-                [f"{ctrl}.R", f"{sp}.R"],       # controller.R  ←  setpoint.R
-                [f"{ctrl}.C", f"{st}.C"],       # controller.C  ←  sensor.C
-                [f"{act}.M", f"{ctrl}.M"],      # actuator.M    ←  controller.M
-                [f"{plt}.{lp.mv}", f"{act}.F"], # plant.MV      ←  actuator.F
+                [f'{ctrl}.R', f'{sp}.R'],  # controller.R  ←  setpoint.R
+                [f'{ctrl}.C', f'{st}.C'],  # controller.C  ←  sensor.C
+                [f'{act}.M', f'{ctrl}.M'],  # actuator.M    ←  controller.M
+                [f'{plt}.{lp.mv}', f'{act}.F'],  # plant.MV      ←  actuator.F
             ]
             # PV source: plant state OR actuator output (flow control)
-            if lp.pv_source == "actuator":
+            if lp.pv_source == 'actuator':
                 # sensor measures actuator output flow F (flow control loop)
-                connections.append([f"{st}.PV", f"{act}.{lp.pv}"])
+                connections.append([f'{st}.PV', f'{act}.{lp.pv}'])
             else:
                 # sensor measures a plant state (level / temperature control)
-                connections.append([f"{st}.PV", f"{plt}.{lp.pv}"])
+                connections.append([f'{st}.PV', f'{plt}.{lp.pv}'])
 
         # External inputs: disturbances + [SP, Kc, tauI, tauD] per loop
-        inplist = [f"{plt}.{d}" for d in self._disturbance_names]
+        inplist = [f'{plt}.{d}' for d in self._disturbance_names]
         for lp in self.loops:
             sp = lp.setpoint.system.name
             ctrl = lp.controller.system.name
             inplist += [
-                f"{sp}.SP",      # setpoint value (engineering units)
-                f"{ctrl}.Kc",    # proportional gain
-                f"{ctrl}.tauI",  # integral time constant
-                f"{ctrl}.tauD",  # derivative time constant
+                f'{sp}.SP',  # setpoint value (engineering units)
+                f'{ctrl}.Kc',  # proportional gain
+                f'{ctrl}.tauI',  # integral time constant
+                f'{ctrl}.tauD',  # derivative time constant
             ]
 
         # External outputs: plant states + M, R, C per loop
-        outlist = [f"{plt}.{s}" for s in self.plant.STATE_NAMES]
+        outlist = [f'{plt}.{s}' for s in self.plant.STATE_NAMES]
         for lp in self.loops:
             ctrl = lp.controller.system.name
             sp = lp.setpoint.system.name
             st = lp.sensor.system.name
             outlist += [
-                f"{ctrl}.M",  # controller output (manipulated variable %)
-                f"{sp}.R",    # normalized setpoint [%]
-                f"{st}.C",    # normalized measurement [%]
+                f'{ctrl}.M',  # controller output (manipulated variable %)
+                f'{sp}.R',  # normalized setpoint [%]
+                f'{st}.C',  # normalized measurement [%]
             ]
 
         return ct.interconnect(
@@ -936,5 +931,5 @@ class ClosedLoopSimulation(ProcessSimulation):
             connections=connections,
             inplist=inplist,
             outlist=outlist,
-            name="closed_loop",
+            name='closed_loop',
         )
