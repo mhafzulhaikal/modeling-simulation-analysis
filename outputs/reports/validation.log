@@ -1,0 +1,85 @@
+Validation Log - Biodiesel Reactor Control Simulation
+Timestamp: 2026-07-20T17:40:27.564598
+================================================================================
+
+Executing StepInfo dynamic response metrics calculations (silently)...
+Original summary report files written successfully.
+
+Executing mathematical validation metrics comparisons...
+Processing Case: FIC-100 - Setpoint...
+Processing Case: FIC-101 - Setpoint...
+Processing Case: FIC-102 - Setpoint...
+Processing Case: LIC-100 - Setpoint-Tight...
+Processing Case: LIC-100 - Setpoint-Averaging...
+Processing Case: LIC-100 - Disturbance-Tight...
+Processing Case: LIC-100 - Disturbance-Averaging...
+Processing Case: TIC-100 - Setpoint-Syn...
+Processing Case: TIC-100 - Setpoint-QDR...
+Processing Case: TIC-100 - Setpoint-IAE...
+Processing Case: TIC-100 - Disturbance-Syn...
+Processing Case: TIC-100 - Disturbance-QDR...
+Processing Case: TIC-100 - Disturbance-IAE...
+Residual time-series dataset saved -> C:\Users\mhafz\OneDrive - student.unri.ac.id\Research\biodiesel-reactor-control\outputs\data\residual_data.csv
+Structured metrics JSON dataset saved -> C:\Users\mhafz\OneDrive - student.unri.ac.id\Research\biodiesel-reactor-control\outputs\reports\validation_metrics.json
+Validation summary table saved -> C:\Users\mhafz\OneDrive - student.unri.ac.id\Research\biodiesel-reactor-control\outputs\data\validation_summary.csv
+
+Calculating Control Loop Performance Integral Errors (SP vs PV)...
+
+================================================================================
+  CONTROL LOOP INTEGRAL PERFORMANCE ERRORS (SP vs PV)
+================================================================================
+
+  [ FIC-100 - Setpoint ]
+    Python: IAE =       363.55 | ISE =      1801.96 | ITAE =    231450.55
+    HYSYS : IAE =       385.91 | ISE =      1850.88 | ITAE =    277971.01
+
+  [ FIC-101 - Setpoint ]
+    Python: IAE =       366.40 | ISE =      1803.22 | ITAE =    233818.58
+    HYSYS : IAE =       383.67 | ISE =      1852.94 | ITAE =    271889.67
+
+  [ FIC-102 - Setpoint ]
+    Python: IAE =       367.93 | ISE =      1805.64 | ITAE =    235187.98
+    HYSYS : IAE =       365.14 | ISE =      1847.46 | ITAE =    235667.25
+
+  [ LIC-100 - Setpoint-Tight ]
+    Python: IAE =      3858.50 | ISE =     26051.78 | ITAE =   3296032.47
+    HYSYS : IAE =      4269.24 | ISE =     27137.55 | ITAE =   7379507.16
+
+  [ LIC-100 - Setpoint-Averaging ]
+    Python: IAE =     37354.19 | ISE =    187522.03 | ITAE = 161195586.70
+    HYSYS : IAE =     58883.69 | ISE =    258168.78 | ITAE = 476936125.00
+
+  [ LIC-100 - Disturbance-Tight ]
+    Python: IAE =     10349.54 | ISE =      1481.96 | ITAE = 457158844.48
+    HYSYS : IAE =     12386.43 | ISE =      2198.45 | ITAE = 546499964.33
+
+  [ LIC-100 - Disturbance-Averaging ]
+    Python: IAE =    794044.25 | ISE =   8303631.24 | ITAE = 37502417635.98
+    HYSYS : IAE =    932929.15 | ISE =  11705390.64 | ITAE = 44035340869.36
+
+  [ TIC-100 - Setpoint-Syn ]
+    Python: IAE =     23039.16 | ISE =    111553.08 | ITAE = 405099365.51
+    HYSYS : IAE =     26941.33 | ISE =    116285.37 | ITAE = 524052725.08
+
+  [ TIC-100 - Setpoint-QDR ]
+    Python: IAE =     16613.81 | ISE =    108154.97 | ITAE = 333290962.65
+    HYSYS : IAE =     16456.36 | ISE =    107504.74 | ITAE = 328201046.94
+
+  [ TIC-100 - Setpoint-IAE ]
+    Python: IAE =     27386.84 | ISE =    113416.98 | ITAE = 490577589.53
+    HYSYS : IAE =     32006.53 | ISE =    120316.67 | ITAE = 639096324.21
+
+  [ TIC-100 - Disturbance-Syn ]
+    Python: IAE =     21562.39 | ISE =    110164.21 | ITAE = 387685457.61
+    HYSYS : IAE =     25091.66 | ISE =    113680.98 | ITAE = 493659160.34
+
+  [ TIC-100 - Disturbance-QDR ]
+    Python: IAE =     16613.81 | ISE =    108154.97 | ITAE = 333290962.65
+    HYSYS : IAE =     16456.36 | ISE =    107504.74 | ITAE = 328201046.94
+
+  [ TIC-100 - Disturbance-IAE ]
+    Python: IAE =     17787.63 | ISE =    109138.53 | ITAE = 353768316.81
+    HYSYS : IAE =     18220.02 | ISE =    108440.68 | ITAE = 361686684.97
+================================================================================
+Validation task completed successfully.
+

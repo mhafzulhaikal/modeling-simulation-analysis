@@ -1,0 +1,46 @@
+==========================================================================================
+  MATHEMATICAL VALIDATION SUMMARY  -  PYTHON VS HYSYS (PV ONLY)
+  Biodiesel Reactor Control System Validation
+==========================================================================================
+
+  Loop    Scenario              Var      N    MAE   RMSE   MAPE%  SMAPE%  PBIAS%     R2
+  ------- --------------------- --- ------ ------ ------ ------- ------- ------- ------
+  FIC-100 Setpoint              PV    7201  0.010  0.023   0.017   0.017  -0.006  1.000
+  FIC-101 Setpoint              PV    7201  0.008  0.017   0.013   0.013   0.008  1.000
+  FIC-102 Setpoint              PV    7201  0.004  0.017   0.007   0.007  -0.003  1.000
+  LIC-100 Setpoint-Tight        PV   60001  0.014  0.038   0.024   0.024   0.023  0.999
+  LIC-100 Setpoint-Averaging    PV   60001  0.718  0.720   1.244   1.236   1.241  0.916
+  LIC-100 Disturbance-Tight     PV  176401  0.024  0.030   0.048   0.048  -0.043  0.838
+  LIC-100 Disturbance-Averaging PV  176401  1.585  1.866   2.519   2.560  -2.519  0.841
+  TIC-100 Setpoint-Syn          PV   80001  0.139  0.264   0.241   0.240   0.249  0.997
+  TIC-100 Setpoint-QDR          PV   80001  0.040  0.141   0.070   0.070   0.058  0.999
+  TIC-100 Setpoint-IAE          PV   80001  0.169  0.281   0.294   0.293   0.306  0.996
+  TIC-100 Disturbance-Syn       PV   80001  0.123  0.239   0.213   0.212   0.219  0.997
+  TIC-100 Disturbance-QDR       PV   80001  0.040  0.141   0.070   0.070   0.058  0.999
+  TIC-100 Disturbance-IAE       PV   80001  0.049  0.110   0.087   0.087   0.031  0.999
+  ------- --------------------- --- ------ ------ ------ ------- ------- ------- ------
+
+==========================================================================================
+  SCIENTIFIC INTERPRETATION GUIDE
+==========================================================================================
+  This section provides a guide for interpreting the validation metrics and plots:
+
+  1. MEAN ABSOLUTE PERCENTAGE ERROR (MAPE):
+     - MAPE is useful as a relative error metric, but it should not be used alone.
+       Specifically, when HYSYS values are close to zero, MAPE can inflate
+       disproportionately or become undefined due to division by zero.
+
+  2. MEAN ABSOLUTE ERROR (MAE) & ROOT MEAN SQUARE ERROR (RMSE):
+     - MAE and RMSE show error magnitude in the original unit.
+     - MAE represents the average linear error, whereas RMSE squashes deviations
+       quadratically, making it more sensitive to transient spikes and large lags.
+
+  4. MEAN BIAS ERROR (MBE) & PERCENT BIAS (PBIAS):
+     - Bias or PBIAS indicates whether Python systematically overpredicts or underpredicts HYSYS.
+       Positive bias shows overprediction; negative bias indicates underprediction.
+
+  5. COEFFICIENT OF DETERMINATION (R2):
+     - R2 indicates whether Python follows the variation pattern of HYSYS, but
+       it should not be interpreted as agreement by itself. Perfect correlation
+       (R2=1) can still occur alongside structural offsets (biases).
+
