@@ -11,3 +11,4 @@ wheels/
 
 # Frameworks & Tooling caches
 .ruff_cache/
+node_modules
