@@ -3,7 +3,7 @@
 This script identifies a First-Order Plus Dead Time (FOPDT) model from
 step response data using `model.fopdt` and calculates controller
 tuning parameters based on classical tuning correlations from
-`model/ctrlparams.py` (Corripio & Smith, 2006).
+`model/ctrlparams.md` (Corripio & Smith, 2006).
 
 Usage:
     python -m model.find_tuning data.csv "Input Column" "Output Column"
