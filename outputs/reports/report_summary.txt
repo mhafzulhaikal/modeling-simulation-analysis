@@ -7,41 +7,41 @@
    -------------------------------------------------------------------------------
    [PYTHON]
      Scenario: Servo (Setpoint Tracking)
-     Performance Index         | Syn             | QDR             | IAE            
+     Performance Index         | Syn             | QDR             | IAE
      ------------------------------------------------------------------------------
-     Decay Ratio               | ---             | 0.019           | 0.056          
-     Rise Time                 | 1833.5 s        | 1714.0 s        | 1713.0 s       
-     Settling Time             | 6293.5 s        | 4093.0 s        | 5468.5 s       
-     Overshoot                 | 0.00 %          | 9.02 %          | 12.53 %        
-     IAE                       | 16274.1         | 15301.6         | 16052.8        
+     Decay Ratio               | ---             | 0.019           | 0.056
+     Rise Time                 | 1833.5 s        | 1714.0 s        | 1713.0 s
+     Settling Time             | 6293.5 s        | 4093.0 s        | 5468.5 s
+     Overshoot                 | 0.00 %          | 9.02 %          | 12.53 %
+     IAE                       | 16274.1         | 15301.6         | 16052.8
 
      Scenario: Regulatory (Disturbance Rejection)
-     Performance Index         | Syn             | QDR             | IAE            
+     Performance Index         | Syn             | QDR             | IAE
      ------------------------------------------------------------------------------
-     Decay Ratio               | ---             | 0.034           | 0.030          
-     Rise Time                 | ---             | ---             | ---            
-     Settling Time             | 4059.0 s        | 1525.5 s        | 1640.5 s       
-     Overshoot                 | 2.16 %          | 1.78 %          | 1.98 %         
-     IAE                       | 5274.6          | 1307.9          | 1729.7         
+     Decay Ratio               | ---             | 0.034           | 0.030
+     Rise Time                 | ---             | ---             | ---
+     Settling Time             | 4059.0 s        | 1525.5 s        | 1640.5 s
+     Overshoot                 | 2.16 %          | 1.78 %          | 1.98 %
+     IAE                       | 5274.6          | 1307.9          | 1729.7
 
    [HYSYS]
      Scenario: Servo (Setpoint Tracking)
-     Performance Index         | Syn             | QDR             | IAE            
+     Performance Index         | Syn             | QDR             | IAE
      ------------------------------------------------------------------------------
-     Decay Ratio               | ---             | 0.025           | 0.121          
-     Rise Time                 | 3371.0 s        | 1905.0 s        | 1840.0 s       
-     Settling Time             | 10448.5 s       | 4037.5 s        | 6067.5 s       
-     Overshoot                 | 0.00 %          | 2.86 %          | 9.43 %         
-     IAE                       | 20431.1         | 15072.0         | 16273.9        
+     Decay Ratio               | ---             | 0.025           | 0.121
+     Rise Time                 | 3371.0 s        | 1905.0 s        | 1840.0 s
+     Settling Time             | 10448.5 s       | 4037.5 s        | 6067.5 s
+     Overshoot                 | 0.00 %          | 2.86 %          | 9.43 %
+     IAE                       | 20431.1         | 15072.0         | 16273.9
 
      Scenario: Regulatory (Disturbance Rejection)
-     Performance Index         | Syn             | QDR             | IAE            
+     Performance Index         | Syn             | QDR             | IAE
      ------------------------------------------------------------------------------
-     Decay Ratio               | ---             | 0.016           | 0.083          
-     Rise Time                 | ---             | ---             | ---            
-     Settling Time             | 3612.5 s        | 1566.5 s        | 1704.5 s       
-     Overshoot                 | 1.86 %          | 1.59 %          | 1.79 %         
-     IAE                       | 4654.9          | 1386.8          | 1948.5         
+     Decay Ratio               | ---             | 0.016           | 0.083
+     Rise Time                 | ---             | ---             | ---
+     Settling Time             | 3612.5 s        | 1566.5 s        | 1704.5 s
+     Overshoot                 | 1.86 %          | 1.59 %          | 1.79 %
+     IAE                       | 4654.9          | 1386.8          | 1948.5
 
 ==================================================================================
 
@@ -49,22 +49,22 @@
    (Scenario: Setpoint Change / Servo Only)
    -------------------------------------------------------------------------------
    [PYTHON]
-     Performance Index         | TLC (Tight)          | ALC (Averaging)     
+     Performance Index         | TLC (Tight)          | ALC (Averaging)
      -----------------------------------------------------------------------
-     Decay Ratio               | 1.225                | ---                 
-     Rise Time                 | 597.5 s              | 8176.0 s            
-     Settling Time             | 754.0 s              | 14572.5 s           
-     Overshoot                 | 0.00 %               | 0.00 %              
-     IAE                       | 3856.0               | 37351.7             
+     Decay Ratio               | 1.225                | ---
+     Rise Time                 | 597.5 s              | 8176.0 s
+     Settling Time             | 754.0 s              | 14572.5 s
+     Overshoot                 | 0.00 %               | 0.00 %
+     IAE                       | 3856.0               | 37351.7
 
    [HYSYS]
-     Performance Index         | TLC (Tight)          | ALC (Averaging)     
+     Performance Index         | TLC (Tight)          | ALC (Averaging)
      -----------------------------------------------------------------------
-     Decay Ratio               | ---                  | ---                 
-     Rise Time                 | 620.0 s              | 12638.0 s           
-     Settling Time             | 785.5 s              | ---                 
-     Overshoot                 | 0.00 %               | 0.00 %              
-     IAE                       | 4267.1               | 58532.6             
+     Decay Ratio               | ---                  | ---
+     Rise Time                 | 620.0 s              | 12638.0 s
+     Settling Time             | 785.5 s              | ---
+     Overshoot                 | 0.00 %               | 0.00 %
+     IAE                       | 4267.1               | 58532.6
 
 ==================================================================================
 
@@ -72,21 +72,21 @@
    (Scenario: Setpoint Change Only)
    -------------------------------------------------------------------------------
    [PYTHON]
-     Performance Index         | FIC-100         | FIC-101         | FIC-102        
+     Performance Index         | FIC-100         | FIC-101         | FIC-102
      ------------------------------------------------------------------------------
-     Decay Ratio               | 2.572           | 0.515           | 0.992          
-     Rise Time                 | 80.5 s          | 81.5 s          | 82.0 s         
-     Settling Time             | 144.0 s         | 146.0 s         | 146.5 s        
-     Overshoot                 | 0.00 %          | 0.01 %          | 0.01 %         
-     IAE                       | 361.1           | 363.9           | 365.5          
+     Decay Ratio               | 2.572           | 0.515           | 0.992
+     Rise Time                 | 80.5 s          | 81.5 s          | 82.0 s
+     Settling Time             | 144.0 s         | 146.0 s         | 146.5 s
+     Overshoot                 | 0.00 %          | 0.01 %          | 0.01 %
+     IAE                       | 361.1           | 363.9           | 365.5
 
    [HYSYS]
-     Performance Index         | FIC-100         | FIC-101         | FIC-102        
+     Performance Index         | FIC-100         | FIC-101         | FIC-102
      ------------------------------------------------------------------------------
-     Decay Ratio               | 2.556           | ---             | 3.000          
-     Rise Time                 | 81.0 s          | 78.0 s          | 78.0 s         
-     Settling Time             | 136.5 s         | 140.0 s         | 140.0 s        
-     Overshoot                 | 0.15 %          | 0.00 %          | 0.02 %         
-     IAE                       | 388.4           | 381.2           | 362.6          
+     Decay Ratio               | 2.556           | ---             | 3.000
+     Rise Time                 | 81.0 s          | 78.0 s          | 78.0 s
+     Settling Time             | 136.5 s         | 140.0 s         | 140.0 s
+     Overshoot                 | 0.15 %          | 0.00 %          | 0.02 %
+     IAE                       | 388.4           | 381.2           | 362.6
 
 ==================================================================================

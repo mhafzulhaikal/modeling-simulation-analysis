@@ -85,26 +85,20 @@ class ControlElement(ABC):
 
     def __init__(self) -> None:
         if not self.INPUT_NAMES:
-            raise ValueError(
-                f"{type(self).__name__}.INPUT_NAMES must be a non-empty list."
-            )
+            raise ValueError(f'{type(self).__name__}.INPUT_NAMES must be a non-empty list.')
         if not self.OUTPUT_NAMES:
-            raise ValueError(
-                f"{type(self).__name__}.OUTPUT_NAMES must be a non-empty list."
-            )
-        if not hasattr(self, "params"):
+            raise ValueError(f'{type(self).__name__}.OUTPUT_NAMES must be a non-empty list.')
+        if not hasattr(self, 'params'):
             raise AttributeError(
-                f"{type(self).__name__}.__init__ must assign self.params "
-                "before calling super().__init__()."
+                f'{type(self).__name__}.__init__ must assign self.params '
+                'before calling super().__init__().'
             )
 
-        self._element_name = self.params.get("name", type(self).__name__.lower())
+        self._element_name = self.params.get('name', type(self).__name__.lower())
 
         # Prefix all parameters with the element name to prevent clashes in
         # ct.interconnect (which flattens all subsystem params into one dict).
-        self.prefixed_params = {
-            f"{self._element_name}_{k}": v for k, v in self.params.items()
-        }
+        self.prefixed_params = {f'{self._element_name}_{k}': v for k, v in self.params.items()}
 
         if self.STATE_NAMES:
             # Dynamic element — register both update and output functions.
@@ -132,7 +126,7 @@ class ControlElement(ABC):
 
     def _unprefix_params(self, params: dict) -> dict:
         """Extract this element's parameters from a flattened interconnect dict."""
-        prefix = f"{self._element_name}_"
+        prefix = f'{self._element_name}_'
         local_params = {}
         for k, v in params.items():
             if k.startswith(prefix):
@@ -191,8 +185,8 @@ class ControlElement(ABC):
             State derivatives dx/dt, length n_states.
         """
         raise NotImplementedError(
-            f"{type(self).__name__}._update() must be implemented for "
-            "dynamic elements (STATE_NAMES is non-empty)."
+            f'{type(self).__name__}._update() must be implemented for '
+            'dynamic elements (STATE_NAMES is non-empty).'
         )
 
     @abstractmethod
@@ -230,8 +224,8 @@ class ControlElement(ABC):
 
     def __repr__(self) -> str:
         return (
-            f"{type(self).__name__}("
-            f"states={len(self.STATE_NAMES)}, "
-            f"inputs={len(self.INPUT_NAMES)}, "
-            f"outputs={len(self.OUTPUT_NAMES)})"
+            f'{type(self).__name__}('
+            f'states={len(self.STATE_NAMES)}, '
+            f'inputs={len(self.INPUT_NAMES)}, '
+            f'outputs={len(self.OUTPUT_NAMES)})'
         )

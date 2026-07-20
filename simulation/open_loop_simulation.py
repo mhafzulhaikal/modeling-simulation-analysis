@@ -34,8 +34,8 @@ from model.config import (
     ACTUATOR_PARAMS,
     PROCESS_PARAMS,
     SENSOR_TRANSMITTER_PARAMS,
-    X0_OPEN_LOOP,
     U_NOMINAL,
+    X0_OPEN_LOOP,
 )
 from model.simsys import OpenLoopSimulation
 
@@ -43,9 +43,9 @@ from model.simsys import OpenLoopSimulation
 # Configuration
 # =============================================================================
 
-TIME_END  = 30_000   # simulation horizon [s]
-TIME_STEP = 0.5      # output time step   [s]
-FIRST_STEP = 600     # time of first step change [s]
+TIME_END = 30_000  # simulation horizon [s]
+TIME_STEP = 0.5  # output time step   [s]
+FIRST_STEP = 600  # time of first step change [s]
 SECOND_STEP = 1_800  # time of second step change [s]
 
 
@@ -55,43 +55,43 @@ SECOND_STEP = 1_800  # time of second step change [s]
 
 plant = BiodieselPlant(**PROCESS_PARAMS)
 
-LCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["LIC-100"])  # level    → f_FAME
-TCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["TIC-100"])  # temp     → f_coolant
-FCV_100 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-100"])  # oil flow → f_oil
-FCV_101 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-101"])  # MeOH     → f_MeOH
-FCV_102 = ActuatorSystem(**ACTUATOR_PARAMS["FIC-102"])  # NaOH     → f_NaOH
+LCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['LIC-100'])  # level    → f_FAME
+TCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['TIC-100'])  # temp     → f_coolant
+FCV_100 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-100'])  # oil flow → f_oil
+FCV_101 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-101'])  # MeOH     → f_MeOH
+FCV_102 = ActuatorSystem(**ACTUATOR_PARAMS['FIC-102'])  # NaOH     → f_NaOH
 
 # Plant MV name → ActuatorSystem
 actuators = {
-    "f_FAME": LCV_100,
-    "f_coolant": TCV_100,
-    "f_oil": FCV_100,
-    "f_MeOH": FCV_101,
-    "f_NaOH": FCV_102,
+    'f_FAME': LCV_100,
+    'f_coolant': TCV_100,
+    'f_oil': FCV_100,
+    'f_MeOH': FCV_101,
+    'f_NaOH': FCV_102,
 }
 
 # Plant PV name → SensorTransmitterSystem
-LT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["LIC-100"])
-TT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["TIC-100"])
-FT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-100"])
-FT_101 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-101"])
-FT_102 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS["FIC-102"])
+LT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['LIC-100'])
+TT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['TIC-100'])
+FT_100 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-100'])
+FT_101 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-101'])
+FT_102 = SensorTransmitterSystem(**SENSOR_TRANSMITTER_PARAMS['FIC-102'])
 
 sensors = {
-    "h": LT_100,
-    "T": TT_100,
-    "f_oil": FT_100,
-    "f_MeOH": FT_101,
-    "f_NaOH": FT_102,
+    'h': LT_100,
+    'T': TT_100,
+    'f_oil': FT_100,
+    'f_MeOH': FT_101,
+    'f_NaOH': FT_102,
 }
 
 sim = OpenLoopSimulation(plant, actuators, sensors)
 
 # Inspect signal layout before running
 print(sim)
-print("Input names :", sim.input_names)
-print("State names :", sim.state_names)
-print("Output names:", sim.output_names)
+print('Input names :', sim.input_names)
+print('State names :', sim.state_names)
+print('Output names:', sim.output_names)
 
 
 # =============================================================================
@@ -117,19 +117,19 @@ time = np.arange(0, TIME_END + TIME_STEP, TIME_STEP)
 #   signal[time >= t2] = val2
 
 # Disturbances — from nominal
-U_disturbances = {k: np.full_like(time, v) for k, v in U_NOMINAL.items() if not k.startswith("f_")}
+U_disturbances = {k: np.full_like(time, v) for k, v in U_NOMINAL.items() if not k.startswith('f_')}
 
 # Controller output (M) profiles [%CO]
 # Keep these fixed for an open-loop test; change one to observe step response.
 M_profiles = {
-    "M_f_FAME":    np.full_like(time, 50.0),
-    "M_f_coolant": np.full_like(time, 80.0),
-    "M_f_oil":     np.full_like(time, 50.0),
-    "M_f_MeOH":    np.full_like(time, 50.0),
-    "M_f_NaOH":    np.full_like(time, 50.0),
+    'M_f_FAME': np.full_like(time, 50.0),
+    'M_f_coolant': np.full_like(time, 80.0),
+    'M_f_oil': np.full_like(time, 50.0),
+    'M_f_MeOH': np.full_like(time, 50.0),
+    'M_f_NaOH': np.full_like(time, 50.0),
 }
 
-M_profiles["M_f_coolant"][time >= FIRST_STEP] = 90.0  # step change in temp controller output
+M_profiles['M_f_coolant'][time >= FIRST_STEP] = 90.0  # step change in temp controller output
 
 U = sim.make_U(time, **U_disturbances, **M_profiles)
 
@@ -153,8 +153,8 @@ X0 = sim.make_X0(**X0_OPEN_LOOP)
 result = sim.run(time, U, X0)
 
 print(result)
-print("h  : %.4f -> %.4f m" % (result["h"][0], result["h"][-1]))
-print("T  : %.2f -> %.2f K" % (result["T"][0], result["T"][-1]))
+print('h  : {:.4f} -> {:.4f} m'.format(result['h'][0], result['h'][-1]))
+print('T  : {:.2f} -> {:.2f} K'.format(result['T'][0], result['T'][-1]))
 
 
 # Removed explicit signal extraction to reduce verbosity.
@@ -180,16 +180,16 @@ print("T  : %.2f -> %.2f K" % (result["T"][0], result["T"][-1]))
 # =============================================================================
 
 plt.figure(figsize=(14, 5))
-plt.plot(time, result["TT_100.C"], label="C_TT_100 — transmitter output [%TO]")
+plt.plot(time, result['TT_100.C'], label='C_TT_100 — transmitter output [%TO]')
 plt.axvline(
     FIRST_STEP,
-    color="gray",
-    linestyle=":",
+    color='gray',
+    linestyle=':',
     alpha=0.5,
-    label=f"Step at t = {FIRST_STEP} s",
+    label=f'Step at t = {FIRST_STEP} s',
 )
-plt.xlabel("Time (s)")
-plt.ylabel("Temperature [%TO]")
+plt.xlabel('Time (s)')
+plt.ylabel('Temperature [%TO]')
 # plt.title("TIC-100 Open-Loop Step Response")  # no title per publication style
 plt.legend(frameon=False)
 plt.grid(True, alpha=0.3)

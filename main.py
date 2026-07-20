@@ -1,6 +1,6 @@
 def main():
-    print("Hello from modeling-simulation-analysis!")
+    print('Hello from modeling-simulation-analysis!')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

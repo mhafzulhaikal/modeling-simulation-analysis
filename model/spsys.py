@@ -52,17 +52,17 @@ class SetPointSystem(ControlElement):
     """
 
     STATE_NAMES = []  # no dynamics — pure algebraic element
-    INPUT_NAMES = ["SP"]
-    OUTPUT_NAMES = ["R"]
+    INPUT_NAMES = ['SP']
+    OUTPUT_NAMES = ['R']
 
     def __init__(self, name: str, hi: float, low: float) -> None:
         if hi <= low:
-            raise ValueError(f"hi ({hi}) must be greater than low ({low}).")
+            raise ValueError(f'hi ({hi}) must be greater than low ({low}).')
 
         self.params = {
-            "name": str(name),
-            "hi": float(hi),
-            "low": float(low),
+            'name': str(name),
+            'hi': float(hi),
+            'low': float(low),
         }
         super().__init__()
 
@@ -96,5 +96,5 @@ class SetPointSystem(ControlElement):
             [R] — normalized setpoint [%].
         """
         SP = float(u[0])
-        R = (SP - params["low"]) / (params["hi"] - params["low"]) * 100.0
+        R = (SP - params['low']) / (params['hi'] - params['low']) * 100.0
         return [R]

@@ -45,7 +45,7 @@ class BiodieselOperatingPoint(OperatingPoint):
         """
         return np.array(
             [
-                1.5,     # h          [m]
+                1.5,  # h          [m]
                 0.0142,  # c_TG       [kmol/m³]
                 2.3760,  # c_MeOH     [kmol/m³]
                 2.0250,  # c_ME       [kmol/m³]
@@ -81,14 +81,14 @@ class BiodieselOperatingPoint(OperatingPoint):
         c_Water_in = 46.2325
 
         # --- Feed stream mass flow rates [kg/s] ---
-        m_oil = 0.291666666655013       # Oil feed mass flow rate        [kg/s]
+        m_oil = 0.291666666655013  # Oil feed mass flow rate        [kg/s]
         m_MeOH = 6.61111111082406e-002  # Methanol feed mass flow rate   [kg/s]
         m_NaOH = 1.38888888883481e-002  # NaOH feed mass flow rate       [kg/s]
 
         # --- Flow rates [m³/s] ---
-        f_oil = m_oil / PROCESS_PARAMS["rho_oil"]
-        f_MeOH = m_MeOH / PROCESS_PARAMS["rho_MeOH"]
-        f_NaOH = m_NaOH / PROCESS_PARAMS["rho_NaOH"]
+        f_oil = m_oil / PROCESS_PARAMS['rho_oil']
+        f_MeOH = m_MeOH / PROCESS_PARAMS['rho_MeOH']
+        f_NaOH = m_NaOH / PROCESS_PARAMS['rho_NaOH']
         f_FAME = 4.62092118065036e-004  # initial guess for FAME outflow from HYSYS
         f_coolant = 0.1787813786090115  # initial guess for coolant flow rate from HYSYS
 
@@ -124,17 +124,17 @@ class BiodieselOperatingPoint(OperatingPoint):
         T_steady = 333.15
         return np.array(
             [
-                h_steady,     # h          — CONSTRAINED
-                0.0142,       # c_TG       — free
-                2.3760,       # c_MeOH     — free
-                2.0250,       # c_ME       — free
-                0.0055,       # c_DG       — free
-                0.0292,       # c_MG       — free
-                0.6537,       # c_Gly      — free
-                0.1481,       # c_Cat      — free
-                1.3156,       # c_Water    — free
-                T_steady,     # T          — CONSTRAINED
-                323.15,       # T_coolant  — free
+                h_steady,  # h          — CONSTRAINED
+                0.0142,  # c_TG       — free
+                2.3760,  # c_MeOH     — free
+                2.0250,  # c_ME       — free
+                0.0055,  # c_DG       — free
+                0.0292,  # c_MG       — free
+                0.6537,  # c_Gly      — free
+                0.1481,  # c_Cat      — free
+                1.3156,  # c_Water    — free
+                T_steady,  # T          — CONSTRAINED
+                323.15,  # T_coolant  — free
             ]
         )
 
@@ -165,15 +165,15 @@ class BiodieselOperatingPoint(OperatingPoint):
         return [0, 9]
 
 
-if __name__ == "__main__":
-    print("Running equilibrium finder for Biodiesel Reactor CSTR...")
+if __name__ == '__main__':
+    print('Running equilibrium finder for Biodiesel Reactor CSTR...')
     plant = BiodieselReactorSystem(**PROCESS_PARAMS)
     finder = BiodieselOperatingPoint(plant.system)
 
     result = finder.find()
 
     output_path = os.path.join(
-        os.path.dirname(__file__), "..", "outputs", "reports", "find_eqpt_output.txt"
+        os.path.dirname(__file__), '..', 'outputs', 'reports', 'find_eqpt_output.txt'
     )
 
     # Ensure output directory exists
@@ -188,63 +188,61 @@ if __name__ == "__main__":
         input_labels = plant.system.input_labels
 
         lines = []
-        lines.append("=" * 80)
-        lines.append("  EQUILIBRIUM STATES (x*)")
-        lines.append("=" * 80)
-        for name, val, guess in zip(state_labels, x_eqpt, x_guess):
+        lines.append('=' * 80)
+        lines.append('  EQUILIBRIUM STATES (x*)')
+        lines.append('=' * 80)
+        for name, val, guess in zip(state_labels, x_eqpt, x_guess, strict=False):
             delta = val - guess
             lines.append(
-                f"  {name:>12s} = {val:>14.6f}   (guess: {guess:>12.6f}, delta = {delta:>+12.6f})"
+                f'  {name:>12s} = {val:>14.6f}   (guess: {guess:>12.6f}, delta = {delta:>+12.6f})'
             )
 
-        lines.append("")
-        lines.append("=" * 80)
-        lines.append("  EQUILIBRIUM INPUTS (u*)")
-        lines.append("=" * 80)
-        for name, val, orig in zip(input_labels, u_eqpt, u_steady):
-            marker = " *FREE*" if name in ("f_FAME", "f_coolant") else ""
-            lines.append(
-                f"  {name:>14s} = {val:>14.6e}   (initial: {orig:>14.6e}){marker}"
-            )
+        lines.append('')
+        lines.append('=' * 80)
+        lines.append('  EQUILIBRIUM INPUTS (u*)')
+        lines.append('=' * 80)
+        for name, val, orig in zip(input_labels, u_eqpt, u_steady, strict=False):
+            marker = ' *FREE*' if name in ('f_FAME', 'f_coolant') else ''
+            lines.append(f'  {name:>14s} = {val:>14.6e}   (initial: {orig:>14.6e}){marker}')
 
         # Mass balance verification
         p = plant.params
-        Ar = p["Ar"]
-        rho = p["rho"]
-        rho_oil = p["rho_oil"]
-        rho_MeOH = p["rho_MeOH"]
-        rho_NaOH = p["rho_NaOH"]
+        Ar = p['Ar']
+        rho = p['rho']
+        rho_oil = p['rho_oil']
+        rho_MeOH = p['rho_MeOH']
+        rho_NaOH = p['rho_NaOH']
 
         inflow_mass = u_eqpt[8] * rho_oil + u_eqpt[9] * rho_MeOH + u_eqpt[10] * rho_NaOH
         outflow_mass = u_eqpt[11] * rho
         dh_dt = (inflow_mass - outflow_mass) / (rho * Ar)
 
-        lines.append("")
-        lines.append("=" * 80)
-        lines.append("  MASS BALANCE VERIFICATION")
-        lines.append("=" * 80)
-        lines.append(f"  Inflow mass rate  = {inflow_mass:.6e} kg/s")
-        lines.append(f"  Outflow mass rate = {outflow_mass:.6e} kg/s")
-        lines.append(f"  dh/dt             = {dh_dt:.6e} m/s   (should be ~0)")
+        lines.append('')
+        lines.append('=' * 80)
+        lines.append('  MASS BALANCE VERIFICATION')
+        lines.append('=' * 80)
+        lines.append(f'  Inflow mass rate  = {inflow_mass:.6e} kg/s')
+        lines.append(f'  Outflow mass rate = {outflow_mass:.6e} kg/s')
+        lines.append(f'  dh/dt             = {dh_dt:.6e} m/s   (should be ~0)')
 
         # Evaluate derivatives at equilibrium
         dx = plant.system.updfcn(0, x_eqpt, u_eqpt, plant.params)
         dx = np.asarray(dx)
-        lines.append("")
-        lines.append("=" * 80)
-        lines.append("  STATE DERIVATIVES AT EQUILIBRIUM (dx/dt)")
-        lines.append("=" * 80)
-        for name, d in zip(state_labels, dx):
-            status = "OK" if abs(d) < 1e-6 else "!!"
-            deriv_label = f"d({name})/dt"
-            lines.append(f"  {status} {deriv_label:<18} = {d:>+14.6e}")
-        lines.append(f"\n  Max |dx/dt| = {np.max(np.abs(dx)):.2e}")
-        lines.append(f"  Min |dx/dt| = {np.min(np.abs(dx)):.2e}")
+        lines.append('')
+        lines.append('=' * 80)
+        lines.append('  STATE DERIVATIVES AT EQUILIBRIUM (dx/dt)')
+        lines.append('=' * 80)
+        for name, d in zip(state_labels, dx, strict=False):
+            status = 'OK' if abs(d) < 1e-6 else '!!'
+            deriv_label = f'd({name})/dt'
+            lines.append(f'  {status} {deriv_label:<18} = {d:>+14.6e}')
+        lines.append(f'\n  Max |dx/dt| = {np.max(np.abs(dx)):.2e}')
+        lines.append(f'  Min |dx/dt| = {np.min(np.abs(dx)):.2e}')
 
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-        print(f"Results saved to: {os.path.abspath(output_path)}")
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines) + '\n')
+        print(f'Results saved to: {os.path.abspath(output_path)}')
     else:
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write("FAILED to find equilibrium point.\n")
-        print(f"FAILED. Details saved to: {os.path.abspath(output_path)}")
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('FAILED to find equilibrium point.\n')
+        print(f'FAILED. Details saved to: {os.path.abspath(output_path)}')

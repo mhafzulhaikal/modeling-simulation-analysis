@@ -31,8 +31,8 @@ import numpy as np
 from model import BiodieselPlant
 from model.config import (
     PROCESS_PARAMS,
-    X0_NOMINAL,
     U_NOMINAL,
+    X0_NOMINAL,
 )
 from model.simsys import DynamicSimulation
 
@@ -40,9 +40,9 @@ from model.simsys import DynamicSimulation
 # Configuration
 # =============================================================================
 
-TIME_END   = 20_000   # simulation horizon [s]
-TIME_STEP  = 0.5      # output time step   [s]
-FIRST_STEP = 600      # time of first step change [s]
+TIME_END = 20_000  # simulation horizon [s]
+TIME_STEP = 0.5  # output time step   [s]
+FIRST_STEP = 600  # time of first step change [s]
 
 
 # =============================================================================
@@ -105,17 +105,17 @@ result = sim.run(time, U, X0)
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
 
-ax1.plot(time, result["T"], label="T — reactor temperature [K]", color="red")
-ax1.axvline(FIRST_STEP, color="gray", linestyle=":", alpha=0.5)
-ax1.set_ylabel("Temperature [K]")
+ax1.plot(time, result['T'], label='T — reactor temperature [K]', color='red')
+ax1.axvline(FIRST_STEP, color='gray', linestyle=':', alpha=0.5)
+ax1.set_ylabel('Temperature [K]')
 ax1.legend(frameon=False)
 ax1.grid(True, alpha=0.3)
 ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
 
-ax2.plot(time, result["h"], label="h — liquid level [m]", color="blue")
-ax2.axvline(FIRST_STEP, color="gray", linestyle=":", alpha=0.5)
-ax2.set_xlabel("Time (s)")
-ax2.set_ylabel("Level [m]")
+ax2.plot(time, result['h'], label='h — liquid level [m]', color='blue')
+ax2.axvline(FIRST_STEP, color='gray', linestyle=':', alpha=0.5)
+ax2.set_xlabel('Time (s)')
+ax2.set_ylabel('Level [m]')
 ax2.legend(frameon=False)
 ax2.grid(True, alpha=0.3)
 ax2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))

@@ -59,11 +59,11 @@ class DynamicPlant(ABC):
 
             # fmt: off
     STATE_NAMES = [
-        "h", "c_TG", "c_MeOH", "c_ME", "c_DG", "c_MG", 
+        "h", "c_TG", "c_MeOH", "c_ME", "c_DG", "c_MG",
         "c_Gly", "c_Cat", "c_Water", "T", "T_coolant"
     ]
     INPUT_NAMES = [
-        "c_TG_in", "T_oil", "c_MeOH_in", "T_MeOH", 
+        "c_TG_in", "T_oil", "c_MeOH_in", "T_MeOH",
         "c_Cat_in", "c_Water_in", "T_NaOH", "T_coolant_in",
         "f_oil", "f_MeOH", "f_NaOH", "f_FAME", "f_coolant"
     ]
@@ -80,22 +80,22 @@ class DynamicPlant(ABC):
             "Cp_MeOH":     Cp_MeOH,
             "rho_NaOH":    rho_NaOH,
             "Cp_NaOH":     Cp_NaOH,
-            
+
             # --- Product mixture properties ---
             "rho":         rho,
             "Cp":          Cp,
-            
+
             # --- Reactor geometry ---
             "Dr":          Dr,
             "Lr":          Lr,
-            
+
             # --- Reaction thermodynamics ---
             "R":           R,
             "To":          To,
             "Hrxn1":       Hrxn1,
             "Hrxn2":       Hrxn2,
             "Hrxn3":       Hrxn3,
-            
+
             # --- Kinetic rate constants ---
             "k1_f":        k1_f,
             "k1_r":        k1_r,
@@ -103,7 +103,7 @@ class DynamicPlant(ABC):
             "k2_r":        k2_r,
             "k3_f":        k3_f,
             "k3_r":        k3_r,
-            
+
             # --- Activation energies ---
             "E1_f":        E1_f,
             "E1_r":        E1_r,
@@ -111,13 +111,13 @@ class DynamicPlant(ABC):
             "E2_r":        E2_r,
             "E3_f":        E3_f,
             "E3_r":        E3_r,
-            
+
             # --- Heat transfer ---
             "UA":          UA,
             "V_coolant":   V_coolant,
             "rho_coolant": rho_coolant,
             "Cp_coolant":  Cp_coolant,
-            
+
             # --- Pre-computed constants (derived; not independent inputs) ---
             "Ar":               Ar,
             "E1f_R":            E1_f / R,             # Arrhenius pre-factors E/R
@@ -152,17 +152,13 @@ class DynamicPlant(ABC):
 
     def __init__(self) -> None:
         if not self.STATE_NAMES:
-            raise ValueError(
-                f"{type(self).__name__}.STATE_NAMES must be a non-empty list."
-            )
+            raise ValueError(f'{type(self).__name__}.STATE_NAMES must be a non-empty list.')
         if not self.INPUT_NAMES:
-            raise ValueError(
-                f"{type(self).__name__}.INPUT_NAMES must be a non-empty list."
-            )
-        if not hasattr(self, "params"):
+            raise ValueError(f'{type(self).__name__}.INPUT_NAMES must be a non-empty list.')
+        if not hasattr(self, 'params'):
             raise AttributeError(
-                f"{type(self).__name__}.__init__ must assign self.params "
-                "before calling super().__init__()."
+                f'{type(self).__name__}.__init__ must assign self.params '
+                'before calling super().__init__().'
             )
 
         self.system = ct.NonlinearIOSystem(
@@ -242,9 +238,7 @@ class DynamicPlant(ABC):
 
     def __repr__(self) -> str:
         return (
-            f"{type(self).__name__}("
-            f"states={len(self.STATE_NAMES)}, "
-            f"inputs={len(self.INPUT_NAMES)})"
+            f'{type(self).__name__}(states={len(self.STATE_NAMES)}, inputs={len(self.INPUT_NAMES)})'
         )
 
 
@@ -351,11 +345,11 @@ class BiodieselPlant(DynamicPlant):
 
     # fmt: off
     STATE_NAMES = [
-        "h", "c_TG", "c_MeOH", "c_ME", "c_DG", "c_MG", 
+        "h", "c_TG", "c_MeOH", "c_ME", "c_DG", "c_MG",
         "c_Gly", "c_Cat", "c_Water", "T", "T_coolant"
     ]
     INPUT_NAMES = [
-        "c_TG_in", "T_oil", "c_MeOH_in", "T_MeOH", 
+        "c_TG_in", "T_oil", "c_MeOH_in", "T_MeOH",
         "c_Cat_in", "c_Water_in", "T_NaOH", "T_coolant_in",
         "f_oil", "f_MeOH", "f_NaOH", "f_FAME", "f_coolant"
     ]
@@ -400,22 +394,22 @@ class BiodieselPlant(DynamicPlant):
             "Cp_MeOH":     Cp_MeOH,
             "rho_NaOH":    rho_NaOH,
             "Cp_NaOH":     Cp_NaOH,
-            
+
             # --- Product mixture properties ---
             "rho":         rho,
             "Cp":          Cp,
-            
+
             # --- Reactor geometry ---
             "Dr":          Dr,
             "Lr":          Lr,
-            
+
             # --- Reaction thermodynamics ---
             "R":           R,
             "To":          To,
             "Hrxn1":       Hrxn1,
             "Hrxn2":       Hrxn2,
             "Hrxn3":       Hrxn3,
-            
+
             # --- Kinetic rate constants ---
             "k1_f":        k1_f,
             "k1_r":        k1_r,
@@ -423,7 +417,7 @@ class BiodieselPlant(DynamicPlant):
             "k2_r":        k2_r,
             "k3_f":        k3_f,
             "k3_r":        k3_r,
-            
+
             # --- Activation energies ---
             "E1_f":        E1_f,
             "E1_r":        E1_r,
@@ -431,13 +425,13 @@ class BiodieselPlant(DynamicPlant):
             "E2_r":        E2_r,
             "E3_f":        E3_f,
             "E3_r":        E3_r,
-            
+
             # --- Heat transfer ---
             "UA":          UA,
             "V_coolant":   V_coolant,
             "rho_coolant": rho_coolant,
             "Cp_coolant":  Cp_coolant,
-            
+
             # --- Pre-computed constants (derived; not independent inputs) ---
             "Ar":               Ar,
             "E1f_R":            E1_f / R,             # Arrhenius pre-factors E/R
@@ -456,7 +450,7 @@ class BiodieselPlant(DynamicPlant):
         super().__init__()
 
     @classmethod
-    def from_defaults(cls) -> "BiodieselPlant":
+    def from_defaults(cls) -> BiodieselPlant:
         """Instantiate using the default PROCESS_PARAMS from model.config."""
         from model.config import PROCESS_PARAMS
 

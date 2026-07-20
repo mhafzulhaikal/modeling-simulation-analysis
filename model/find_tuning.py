@@ -35,7 +35,7 @@ def calculate_tunings(model: FOPDTModel) -> dict:
     t0 = max(model.t0, 1e-6)
 
     if abs(K) < 1e-10:
-        print("Warning: Process gain K is near zero. Cannot calculate tunings.")
+        print('Warning: Process gain K is near zero. Cannot calculate tunings.')
         return {}
 
     ratio = t0 / tau
@@ -57,26 +57,26 @@ def calculate_tunings(model: FOPDTModel) -> dict:
     tauI_PID_QDR = tauI_prime + tauD_prime
     tauD_PID_QDR = tauD_prime * tauI_prime / (tauI_prime + tauD_prime)
 
-    tunings["Quarter Decay Ratio (QDR)"] = {
-        "P": {"Kc": (1.0 / K) * (ratio) ** (-1), "tauI": 0.0, "tauD": 0.0},
-        "PI": {"Kc": Kc_PI_QDR, "tauI": tauI_PI_QDR, "tauD": 0.0},
-        "PID": {"Kc": Kc_PID_QDR, "tauI": tauI_PID_QDR, "tauD": tauD_PID_QDR},
+    tunings['Quarter Decay Ratio (QDR)'] = {
+        'P': {'Kc': (1.0 / K) * (ratio) ** (-1), 'tauI': 0.0, 'tauD': 0.0},
+        'PI': {'Kc': Kc_PI_QDR, 'tauI': tauI_PI_QDR, 'tauD': 0.0},
+        'PID': {'Kc': Kc_PID_QDR, 'tauI': tauI_PID_QDR, 'tauD': tauD_PID_QDR},
     }
 
     # =========================================================================
     # 2. MINIMUM IAE - DISTURBANCE
     # =========================================================================
-    tunings["Minimum IAE (Disturbance)"] = {
-        "P": {"Kc": (0.902 / K) * (ratio) ** (-0.985), "tauI": 0.0, "tauD": 0.0},
-        "PI": {
-            "Kc": (0.994 / K) * (ratio) ** (-0.986),
-            "tauI": (tau / 0.608) * (ratio) ** 0.707,
-            "tauD": 0.0,
+    tunings['Minimum IAE (Disturbance)'] = {
+        'P': {'Kc': (0.902 / K) * (ratio) ** (-0.985), 'tauI': 0.0, 'tauD': 0.0},
+        'PI': {
+            'Kc': (0.994 / K) * (ratio) ** (-0.986),
+            'tauI': (tau / 0.608) * (ratio) ** 0.707,
+            'tauD': 0.0,
         },
-        "PID": {
-            "Kc": (1.435 / K) * (ratio) ** (-0.921),
-            "tauI": (tau / 0.878) * (ratio) ** 0.749,
-            "tauD": 0.482 * tau * (ratio) ** 1.137,
+        'PID': {
+            'Kc': (1.435 / K) * (ratio) ** (-0.921),
+            'tauI': (tau / 0.878) * (ratio) ** 0.749,
+            'tauD': 0.482 * tau * (ratio) ** 1.137,
         },
     }
 
@@ -87,16 +87,16 @@ def calculate_tunings(model: FOPDTModel) -> dict:
     denom_pi = 1.02 - 0.323 * ratio
     denom_pid = 0.740 - 0.130 * ratio
 
-    tunings["Minimum IAE (Set Point)"] = {
-        "PI": {
-            "Kc": (0.758 / K) * (ratio) ** (-0.861),
-            "tauI": tau / denom_pi if denom_pi > 0 else float("inf"),
-            "tauD": 0.0,
+    tunings['Minimum IAE (Set Point)'] = {
+        'PI': {
+            'Kc': (0.758 / K) * (ratio) ** (-0.861),
+            'tauI': tau / denom_pi if denom_pi > 0 else float('inf'),
+            'tauD': 0.0,
         },
-        "PID": {
-            "Kc": (1.086 / K) * (ratio) ** (-0.869),
-            "tauI": tau / denom_pid if denom_pid > 0 else float("inf"),
-            "tauD": 0.348 * tau * (ratio) ** 0.914,
+        'PID': {
+            'Kc': (1.086 / K) * (ratio) ** (-0.869),
+            'tauI': tau / denom_pid if denom_pid > 0 else float('inf'),
+            'tauD': 0.348 * tau * (ratio) ** 0.914,
         },
     }
 
@@ -121,79 +121,69 @@ def calculate_tunings(model: FOPDTModel) -> dict:
         tauD_prime_Dahlin * tauI_prime_Dahlin / (tauI_prime_Dahlin + tauD_prime_Dahlin)
     )
 
-    tunings["Dahlin Synthesis (Set Point)"] = {
-        "PI": {"Kc": Kc_PI_Dahlin, "tauI": tauI_PI_Dahlin, "tauD": 0.0},
-        "PID": {"Kc": Kc_PID_Dahlin, "tauI": tauI_PID_Dahlin, "tauD": tauD_PID_Dahlin},
+    tunings['Dahlin Synthesis (Set Point)'] = {
+        'PI': {'Kc': Kc_PI_Dahlin, 'tauI': tauI_PI_Dahlin, 'tauD': 0.0},
+        'PID': {'Kc': Kc_PID_Dahlin, 'tauI': tauI_PID_Dahlin, 'tauD': tauD_PID_Dahlin},
     }
 
     # =========================================================================
     # 5. 5% OVERSHOOT
     # =========================================================================
-    tunings["5% Overshoot"] = {
-        "P": {"Kc": (0.5 / K) * (ratio) ** (-1), "tauI": 0.0, "tauD": 0.0}
-    }
+    tunings['5% Overshoot'] = {'P': {'Kc': (0.5 / K) * (ratio) ** (-1), 'tauI': 0.0, 'tauD': 0.0}}
 
     return tunings
 
 
 def print_tunings(tunings: dict):
     """Format and print the tunings to the console."""
-    print("\n" + "=" * 80)
-    print("  PID CONTROLLER TUNING PARAMETERS")
-    print("=" * 80)
+    print('\n' + '=' * 80)
+    print('  PID CONTROLLER TUNING PARAMETERS')
+    print('=' * 80)
 
     if not tunings:
-        print("  No tunings available.")
+        print('  No tunings available.')
         return
 
     for method, controllers in tunings.items():
-        print(f"\n--- {method} ---")
+        print(f'\n--- {method} ---')
         for ctype, params in controllers.items():
-            kc = params.get("Kc", 0.0)
-            taui = params.get("tauI", 0.0)
-            taud = params.get("tauD", 0.0)
+            kc = params.get('Kc', 0.0)
+            taui = params.get('tauI', 0.0)
+            taud = params.get('tauD', 0.0)
 
             # Format handling for inf
-            taui_str = f"{taui:10.4f}" if taui != float("inf") else "       inf"
-            print(
-                f"  {ctype:<4}: Kc = {kc:10.4f}, tauI = {taui_str}, tauD = {taud:10.4f}"
-            )
+            taui_str = f'{taui:10.4f}' if taui != float('inf') else '       inf'
+            print(f'  {ctype:<4}: Kc = {kc:10.4f}, tauI = {taui_str}, tauD = {taud:10.4f}')
 
-    print("\n" + "=" * 80)
+    print('\n' + '=' * 80)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Find PID tuning parameters from open-loop step test data."
+        description='Find PID tuning parameters from open-loop step test data.'
+    )
+    parser.add_argument('csv_file', help='Path to the CSV file containing step test data.')
+    parser.add_argument('input_col', help='Name of the input (manipulated variable) column.')
+    parser.add_argument('output_col', help='Name of the output (process variable) column.')
+    parser.add_argument(
+        '--time_col', default='Time', help='Name of the time column (default: Time).'
     )
     parser.add_argument(
-        "csv_file", help="Path to the CSV file containing step test data."
-    )
-    parser.add_argument(
-        "input_col", help="Name of the input (manipulated variable) column."
-    )
-    parser.add_argument(
-        "output_col", help="Name of the output (process variable) column."
-    )
-    parser.add_argument(
-        "--time_col", default="Time", help="Name of the time column (default: Time)."
-    )
-    parser.add_argument(
-        "--method",
-        default="fast",
-        choices=["two-point", "fast", "robust"],
-        help="FOPDT identification method (default: fast).",
+        '--method',
+        default='fast',
+        choices=['two-point', 'fast', 'robust'],
+        help='FOPDT identification method (default: fast).',
     )
 
     args = parser.parse_args()
 
-    print(f"\nLoading data from {args.csv_file}...")
+    print(f'\nLoading data from {args.csv_file}...')
     try:
         df = pd.read_csv(args.csv_file)
         # Strip whitespace from column names
         df.columns = [c.strip() for c in df.columns]
     except Exception as e:
-        print(f"Error loading CSV file: {e}")
+        print(f'Error loading CSV file: {e}')
         sys.exit(1)
 
     if args.time_col not in df.columns:
@@ -216,7 +206,7 @@ def main():
     input_data = df[args.input_col].to_numpy()
     output_data = df[args.output_col].to_numpy()
 
-    print(f"\nIdentifying FOPDT model (method: {args.method})...")
+    print(f'\nIdentifying FOPDT model (method: {args.method})...')
     model, metrics, _ = identify_fopdt(
         time, input_data, output_data, method=args.method, verbose=True
     )
@@ -225,5 +215,5 @@ def main():
     print_tunings(tunings)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -28,22 +28,22 @@ PROCESS_PARAMS = {
     "Cp_MeOH":     0.6734,                # methanol heat capacity         [kcal/(kg·K)]
     "rho_NaOH":    1041.12,               # NaOH solution density          [kg/m³]
     "Cp_NaOH":     0.8511,                # NaOH heat capacity             [kcal/(kg·K)]
-    
+
     # --- Product mixture properties ---
     "rho":         792.77,                # mixture density                [kg/m³]
     "Cp":          0.5234,                # mixture heat capacity          [kcal/(kg·K)]
-    
+
     # --- Reactor geometry ---
     "Dr":          1.219,                 # internal diameter              [m]
     "Lr":          3.0,                   # length                         [m]
-    
+
     # --- Reaction thermodynamics ---
     "R":           1.987,                 # gas constant                   [kcal/(kmol·K)]
     "To":          323.15,                # Arrhenius ref. temp.           [K]
     "Hrxn1":      -14379.67807351148,     # heat of reaction 1             [kcal/kmol]
     "Hrxn2":      -237.28589845450915,    # heat of reaction 2             [kcal/kmol]
     "Hrxn3":      -12351.943870983516,    # heat of reaction 3             [kcal/kmol]
-    
+
     # --- Kinetic rate constants ---
     "k1_f":        0.02311,               # reaction 1 forward
     "k1_r":        0.001867,              # reaction 1 reverse
@@ -51,7 +51,7 @@ PROCESS_PARAMS = {
     "k2_r":        0.002217,              # reaction 2 reverse
     "k3_f":        0.05754,               # reaction 3 forward
     "k3_r":        0.000267,              # reaction 3 reverse
-    
+
     # --- Activation energies [kJ/kmol] ---
     "E1_f":        13500.0,               # reaction 1 forward
     "E1_r":        10300.0,               # reaction 1 reverse
@@ -59,11 +59,11 @@ PROCESS_PARAMS = {
     "E2_r":        16200.0,               # reaction 2 reverse
     "E3_f":        6200.0,                # reaction 3 forward
     "E3_r":        11900.0,               # reaction 3 reverse
-    
+
     # --- Heat transfer ---
     "UA":          0.3770945,             # overall heat transfer coeff    [kcal/(s·K)]
     "V_coolant":   0.3607,                # cooling jacket volume          [m³]
-    
+
     # --- Cooling fluid properties ---
     "rho_coolant": 998.0,                 # water density                  [kg/m³]
     "Cp_coolant":  1.0,                   # water heat capacity            [kcal/(kg·K)]
@@ -74,11 +74,11 @@ PROCESS_PARAMS = {
 # Nominal Mass Flow Rates [kg/s]
 # =============================================================================
 M_NOMINAL = {
-    "m_oil":        0.291666666655013,
-    "m_MeOH":       6.61111111082406e-002,
-    "m_NaOH":       1.38888888883481e-002,
-    "m_FAME":       4.688202967463472219e-04 * PROCESS_PARAMS["rho"],
-    "m_coolant":    1.511403610545926292e-04 * PROCESS_PARAMS["rho_coolant"],
+    'm_oil': 0.291666666655013,
+    'm_MeOH': 6.61111111082406e-002,
+    'm_NaOH': 1.38888888883481e-002,
+    'm_FAME': 4.688202967463472219e-04 * PROCESS_PARAMS['rho'],
+    'm_coolant': 1.511403610545926292e-04 * PROCESS_PARAMS['rho_coolant'],
 }
 
 # =============================================================================
@@ -95,7 +95,7 @@ U_NOMINAL = {
     "c_Water_in":   46.2325,              # inlet Water concentration      [kmol/m³]
     "T_NaOH":       298.15,               # inlet NaOH temperature         [K]
     "T_coolant_in": 298.15,               # inlet coolant temperature      [K]
-    
+
     # Manipulated Variables (Flows)
     "f_oil":        M_NOMINAL["m_oil"] / PROCESS_PARAMS["rho_oil"],            # nominal oil flow            [m³/s]
     "f_MeOH":       M_NOMINAL["m_MeOH"] / PROCESS_PARAMS["rho_MeOH"],          # nominal MeOH flow           [m³/s]
@@ -174,32 +174,32 @@ X0_CLOSED_LOOP = {
 # =============================================================================
 # fmt: off
 SENSOR_TRANSMITTER_PARAMS = {
-    "LIC-100": { 
+    "LIC-100": {
         "name":  "LT_100",                              # name
         "hi":    3.0,                                   # high range value [m] | 100% level
         "low":   0.0,                                   # low range value [m]
         "tauT":  0.0                                    # time constant [s]
     },
-    "FIC-100": { 
+    "FIC-100": {
         "name":  "FT_100",
-        "hi":    U_NOMINAL["f_oil"] * 2.0,             # 100% overcapacity oil flow rate [m³/s]  
+        "hi":    U_NOMINAL["f_oil"] * 2.0,             # 100% overcapacity oil flow rate [m³/s]
         "low":   0.0,
-        "tauT":  0.0 
+        "tauT":  0.0
     },
-    "FIC-101": { 
-        "name":  "FT_101", 
+    "FIC-101": {
+        "name":  "FT_101",
         "hi":    U_NOMINAL["f_MeOH"] * 2.0,            # 100% overcapacity MeOH flow rate [m³/s]
         "low":   0.0,
         "tauT":  0.0
     },
-    "FIC-102": { 
-        "name":  "FT_102", 
+    "FIC-102": {
+        "name":  "FT_102",
         "hi":    U_NOMINAL["f_NaOH"] * 2.0,            # 100% overcapacity NaOH flow rate [m³/s]
         "low":   0.0,
         "tauT":  0.0
     },
-    "TIC-100": { 
-        "name":  "TT_100", 
+    "TIC-100": {
+        "name":  "TT_100",
         "hi":    368.15,                                # high range value [K]
         "low":   298.15,                                # low range value [K]
         "tauT":  45.0                                   # time constant [s]
@@ -293,7 +293,7 @@ SETPOINT_PARAMS = {
 # =============================================================================
 # fmt: off
 TUNING_PARAMS = {
-    "LIC-100": { 
+    "LIC-100": {
         "Tight" :     { "Kc": 1.0, "tauI": 0.0, "tauD": 0.0 },  # Tight Level (P-only)
         "Averaging" : { "Kc": 77.8, "tauI": 0.0, "tauD": 0.0 }, # Averaging Level (P-only)
     },

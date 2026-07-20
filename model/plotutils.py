@@ -5,8 +5,9 @@ suitable for academic publications.
 """
 
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def _save_fig(fig, path, dpi=600):
@@ -23,9 +24,15 @@ def _save_fig(fig, path, dpi=600):
     # Draw a border rectangle just inside the figure edges so it is fully
     # visible even after bbox_inches='tight' trimming.
     border = mpatches.Rectangle(
-        xy=(0.005, 0.005), width=0.990, height=0.990,
-        linewidth=1.2, edgecolor='#1a1a1a', facecolor='none',
-        transform=fig.transFigure, clip_on=False, zorder=10,
+        xy=(0.005, 0.005),
+        width=0.990,
+        height=0.990,
+        linewidth=1.2,
+        edgecolor='#1a1a1a',
+        facecolor='none',
+        transform=fig.transFigure,
+        clip_on=False,
+        zorder=10,
     )
     fig.add_artist(border)
 
@@ -35,8 +42,10 @@ def _save_fig(fig, path, dpi=600):
     else:
         fig.savefig(path, dpi=dpi, bbox_inches='tight', pad_inches=0.05)
 
+
 class _BoxConfig:
     """Configuration for box dimensions and margins (centralized for consistency)."""
+
     def __init__(self, y_span, extra_margin=0):
         self.y_span = y_span
         self.extra_margin = extra_margin
@@ -46,9 +55,11 @@ class _BoxConfig:
         self.box_width_estimate = y_span * 0.15  # Estimated width for collision detection
 
         # Margins (improved spacing)
-        self.margin_from_data = y_span * (0.03 + extra_margin * 0.05)      # 3% + extra
-        self.margin_from_axis = y_span * (0.06 + extra_margin * 0.03)      # 6% + extra
-        self.margin_between_boxes = y_span * (0.12 + extra_margin * 0.08)  # 12% + extra (increased for better spacing)
+        self.margin_from_data = y_span * (0.03 + extra_margin * 0.05)  # 3% + extra
+        self.margin_from_axis = y_span * (0.06 + extra_margin * 0.03)  # 6% + extra
+        self.margin_between_boxes = y_span * (
+            0.12 + extra_margin * 0.08
+        )  # 12% + extra (increased for better spacing)
 
         # Collision detection threshold
         self.min_x_separation = y_span * 0.2
@@ -107,13 +118,22 @@ def _resolve_box_y(box_y, idx, default):
     if isinstance(box_y, (list, tuple, np.ndarray)):  # list / array / sequence
         if idx < len(box_y):
             return box_y[idx]
-        return default                     # out of range → auto
-    return box_y                           # scalar → same for all boxes
+        return default  # out of range → auto
+    return box_y  # scalar → same for all boxes
 
 
-def _calculate_box_positions(tr_x, ts_x, y_data, y_sp_data, y_min, y_max,
-                             step_time, settling_threshold=0.02,
-                             min_x_separation=None, extra_margin=0):
+def _calculate_box_positions(
+    tr_x,
+    ts_x,
+    y_data,
+    y_sp_data,
+    y_min,
+    y_max,
+    step_time,
+    settling_threshold=0.02,
+    min_x_separation=None,
+    extra_margin=0,
+):
     """Calculate smart positions for tR and tS boxes with improved collision handling.
 
     Design improvements:
@@ -206,10 +226,18 @@ def _calculate_box_positions(tr_x, ts_x, y_data, y_sp_data, y_min, y_max,
     will_collide = x_distance < min_x_separation
 
     # Create box representations for collision check
-    tr_box = {'x': tr_x, 'y_center': tr_y_center, 'height': config.box_height,
-              'width': config.box_width_estimate}
-    ts_box = {'x': ts_x, 'y_center': ts_y_center, 'height': config.box_height,
-              'width': config.box_width_estimate}
+    tr_box = {
+        'x': tr_x,
+        'y_center': tr_y_center,
+        'height': config.box_height,
+        'width': config.box_width_estimate,
+    }
+    ts_box = {
+        'x': ts_x,
+        'y_center': ts_y_center,
+        'height': config.box_height,
+        'width': config.box_width_estimate,
+    }
 
     # If boxes collide horizontally, push tS higher (away from tR)
     if will_collide and _boxes_collide(tr_box, ts_box, x_threshold=None):
@@ -250,23 +278,43 @@ def _calculate_box_positions(tr_x, ts_x, y_data, y_sp_data, y_min, y_max,
         'ts_vline_ymin': ts_vline_ymin,
         'ts_vline_ymax': ts_vline_ymax,
         'adjusted': will_collide,
-        'config': config
+        'config': config,
     }
 
 
-def plot_response(time, y, u, step_time, step_info=None,
-                       title=None, ylabel=None, xlabel='Time (s)',
-                       y_label_unit=None, figsize=(14, 7),
-                       show_settling_band=True, show_rise_time=True,
-                       show_rise_time_box=True, show_settling_time_box=True,
-                       y_initial=None, settling_threshold=0.02, axhline_color='#1a1a1a',
-                       curve_color='#0055cc', setpoint_color='#d65a00',
-                       rise_time_color='#008000', settling_time_color='#cc0000',
-                       legend_loc='best', grid_alpha=0.3,
-                       tight_layout=True, dpi=None, savefig_path=None,
-                       tuning_label=None, box_margin=0,
-                       tr_box_y=None, ts_box_y=None,
-                       ylim=None):
+def plot_response(
+    time,
+    y,
+    u,
+    step_time,
+    step_info=None,
+    title=None,
+    ylabel=None,
+    xlabel='Time (s)',
+    y_label_unit=None,
+    figsize=(14, 7),
+    show_settling_band=True,
+    show_rise_time=True,
+    show_rise_time_box=True,
+    show_settling_time_box=True,
+    y_initial=None,
+    settling_threshold=0.02,
+    axhline_color='#1a1a1a',
+    curve_color='#0055cc',
+    setpoint_color='#d65a00',
+    rise_time_color='#008000',
+    settling_time_color='#cc0000',
+    legend_loc='best',
+    grid_alpha=0.3,
+    tight_layout=True,
+    dpi=None,
+    savefig_path=None,
+    tuning_label=None,
+    box_margin=0,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Create publication-quality step response plot with performance metrics.
 
     Parameters
@@ -423,7 +471,9 @@ def plot_response(time, y, u, step_time, step_info=None,
     # Matches StepInfo definition: delta = yfinal - y_initial
     delta = y_setpoint_final - y_initial
     is_zero_delta = abs(delta) < 1e-6
-    step_magnitude = abs(y_setpoint_final) if (is_zero_delta and y_setpoint_final != 0) else abs(delta)
+    step_magnitude = (
+        abs(y_setpoint_final) if (is_zero_delta and y_setpoint_final != 0) else abs(delta)
+    )
 
     # Create figure and axis
     fig, ax = plt.subplots(figsize=figsize)
@@ -432,8 +482,7 @@ def plot_response(time, y, u, step_time, step_info=None,
     ax.plot(time, y, label='Process Variable (PV)', color=curve_color, linewidth=2.0)
 
     # Plot setpoint
-    ax.plot(time, u, label='Reference (R)', linestyle='--',
-            color=setpoint_color, linewidth=1.5)
+    ax.plot(time, u, label='Reference (R)', linestyle='--', color=setpoint_color, linewidth=1.5)
 
     # Add settling time band if requested and step_info available
     # Settling band formula matches step_info.py:
@@ -442,15 +491,18 @@ def plot_response(time, y, u, step_time, step_info=None,
         y_band_low = y_setpoint_final - settling_threshold * step_magnitude
         y_band_high = y_setpoint_final + settling_threshold * step_magnitude
 
-        ax.axhline(y=y_band_low, color=axhline_color, linestyle=':',
-                   linewidth=1.5, alpha=0.7)
-        ax.axhline(y=y_band_high, color=axhline_color, linestyle=':',
-                   linewidth=1.5, alpha=0.7)
+        ax.axhline(y=y_band_low, color=axhline_color, linestyle=':', linewidth=1.5, alpha=0.7)
+        ax.axhline(y=y_band_high, color=axhline_color, linestyle=':', linewidth=1.5, alpha=0.7)
 
         # Shade the settling band
-        ax.fill_between(time, y_band_low, y_band_high, alpha=0.1, color=axhline_color,
-                        label=f'Settling Band (±{settling_threshold*100:.0f}%)')
-
+        ax.fill_between(
+            time,
+            y_band_low,
+            y_band_high,
+            alpha=0.1,
+            color=axhline_color,
+            label=f'Settling Band (±{settling_threshold * 100:.0f}%)',
+        )
 
     # Collect rise time and settling time data BEFORE plotting (for smart y-axis extension)
     rise_times_data = []
@@ -491,40 +543,48 @@ def plot_response(time, y, u, step_time, step_info=None,
                     rise_time_abs = float(safe_step_time + rise_time)
 
             if not np.isnan(rise_time_abs):
-                rise_times_data.append({
-                    'time': rise_time_abs,
-                    'value': rise_time,
-                    'color': rise_time_color
-                })
+                rise_times_data.append(
+                    {'time': rise_time_abs, 'value': rise_time, 'color': rise_time_color}
+                )
 
     if step_info is not None and show_settling_time_box:
         settling_time = step_info.metrics.SettlingTime
         if not np.isnan(settling_time):
             settling_time_abs = safe_step_time + settling_time
-            settling_times_data.append({
-                'time': settling_time_abs,
-                'value': settling_time,
-                'color': settling_time_color
-            })
+            settling_times_data.append(
+                {'time': settling_time_abs, 'value': settling_time, 'color': settling_time_color}
+            )
 
     # === EXTEND Y-AXIS based on stagger levels needed (before plotting boxes) ===
     if ylim is not None:
         ax.set_ylim(ylim)
-    
+
     y_min, y_max = ax.get_ylim()
     y_span = y_max - y_min
-    
+
     x_lo, x_hi = ax.get_xlim()
-    slot_frac = 0.065 + 0.02   # box_height + margin
-    edge_frac = 0.06            # margin_from_axis
-    clearance_frac = 0.15       # clearance between box and curves
+    slot_frac = 0.065 + 0.02  # box_height + margin
+    edge_frac = 0.06  # margin_from_axis
+    clearance_frac = 0.15  # clearance between box and curves
 
     # Pre-extend y-axis based on actual stagger levels needed
-    n_tr = _needed_levels(rise_times_data, x_lo, x_hi) if (rise_times_data and show_rise_time_box) else 0
-    n_ts = _needed_levels(settling_times_data, x_lo, x_hi) if (settling_times_data and show_settling_time_box) else 0
+    n_tr = (
+        _needed_levels(rise_times_data, x_lo, x_hi)
+        if (rise_times_data and show_rise_time_box)
+        else 0
+    )
+    n_ts = (
+        _needed_levels(settling_times_data, x_lo, x_hi)
+        if (settling_times_data and show_settling_time_box)
+        else 0
+    )
 
-    space_bot = (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_tr > 0 else 0
-    space_top = (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_ts > 0 else 0
+    space_bot = (
+        (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_tr > 0 else 0
+    )
+    space_top = (
+        (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_ts > 0 else 0
+    )
 
     ax.set_ylim(y_min - space_bot, y_max + space_top)
 
@@ -533,10 +593,16 @@ def plot_response(time, y, u, step_time, step_info=None,
 
     # === PLOT RISE TIME BOXES ===
     if rise_times_data and show_rise_time_box:
-        positioned = _stack_boxes_smart(rise_times_data, y_min_extended, y_max_extended, 
-                                       y_max_extended - y_min_extended,
-                                       position_type='bottom', x_min=x_lo, x_max=x_hi)
-        
+        positioned = _stack_boxes_smart(
+            rise_times_data,
+            y_min_extended,
+            y_max_extended,
+            y_max_extended - y_min_extended,
+            position_type='bottom',
+            x_min=x_lo,
+            x_max=x_hi,
+        )
+
         for i, box in enumerate(positioned):
             if tuning_label:
                 tr_text = f'$t_R$ = {box["value"]:.0f} s\n({tuning_label})'
@@ -544,23 +610,50 @@ def plot_response(time, y, u, step_time, step_info=None,
                 tr_text = f'$t_R$ = {box["value"]:.0f} s'
 
             # Vline extending fully from extended y_min to y_max
-            ax.vlines(x=box['time'], ymin=y_min_extended, ymax=y_max_extended, colors=box['color'], linestyles='--', linewidth=1.5,
-                     alpha=0.7, label='Rise Time', zorder=2)
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min_extended,
+                ymax=y_max_extended,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.5,
+                alpha=0.7,
+                label='Rise Time',
+                zorder=2,
+            )
 
             # Box with text
-            ax.text(x=box['time'], y=_resolve_box_y(tr_box_y, i, box['y_center']), 
-                   s=tr_text, color=box['color'], fontsize=11, fontweight='bold',
-                   ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.3',
-                            facecolor='white', edgecolor=box['color'], 
-                            alpha=1.0, linewidth=1.5))
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(tr_box_y, i, box['y_center']),
+                s=tr_text,
+                color=box['color'],
+                fontsize=11,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.3',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # === PLOT SETTLING TIME BOXES ===
     if settling_times_data and show_settling_time_box:
-        positioned = _stack_boxes_smart(settling_times_data, y_min_extended, y_max_extended,
-                                       y_max_extended - y_min_extended,
-                                       position_type='top', x_min=x_lo, x_max=x_hi)
-        
+        positioned = _stack_boxes_smart(
+            settling_times_data,
+            y_min_extended,
+            y_max_extended,
+            y_max_extended - y_min_extended,
+            position_type='top',
+            x_min=x_lo,
+            x_max=x_hi,
+        )
+
         for i, box in enumerate(positioned):
             if tuning_label:
                 ts_text = f'$t_S$ = {box["value"]:.0f} s\n({tuning_label})'
@@ -568,20 +661,43 @@ def plot_response(time, y, u, step_time, step_info=None,
                 ts_text = f'$t_S$ = {box["value"]:.0f} s'
 
             # Vline extending fully from extended y_min to y_max
-            ax.vlines(x=box['time'], ymin=y_min_extended, ymax=y_max_extended, colors=box['color'], linestyles='--', linewidth=1.5,
-                     alpha=0.7, label='Settling Time', zorder=2)
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min_extended,
+                ymax=y_max_extended,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.5,
+                alpha=0.7,
+                label='Settling Time',
+                zorder=2,
+            )
 
             # Box with text
-            ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']),
-                   s=ts_text, color=box['color'], fontsize=11, fontweight='bold',
-                   ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.3',
-                            facecolor='white', edgecolor=box['color'],
-                            alpha=1.0, linewidth=1.5))
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                s=ts_text,
+                color=box['color'],
+                fontsize=11,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.3',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # Labels and formatting
     if ylabel:
-        ax.set_ylabel(f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(
+            f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold'
+        )
 
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold', labelpad=8)
 
@@ -590,9 +706,16 @@ def plot_response(time, y, u, step_time, step_info=None,
 
     # Legend with smart placement to avoid overlap
     # 'best' uses an algorithm to minimize overlap with data
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09),
-              ncol=6, fontsize=10, frameon=True, framealpha=0.95,
-              edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=6,
+        fontsize=10,
+        frameon=True,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
     ax.grid(True, alpha=grid_alpha)
 
     # Publication-quality formatting with all spines visible
@@ -613,13 +736,14 @@ def plot_response(time, y, u, step_time, step_info=None,
         if dpi is None:
             dpi = 600  # publication default
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, ax
 
 
-def _stack_boxes_smart(boxes_list, y_min, y_max, y_span, position_type='bottom',
-                       x_min=None, x_max=None):
+def _stack_boxes_smart(
+    boxes_list, y_min, y_max, y_span, position_type='bottom', x_min=None, x_max=None
+):
     """Smart stacking algorithm for multiple boxes (rise time or settling time).
 
     Boxes that are close in x-position are staggered vertically so they never overlap.
@@ -650,9 +774,9 @@ def _stack_boxes_smart(boxes_list, y_min, y_max, y_span, position_type='bottom',
     if not boxes_list:
         return []
 
-    box_height       = y_span * 0.065
-    margin           = y_span * 0.02   # gap between stagger levels
-    margin_from_axis = y_span * 0.06   # gap from y_min / y_max edge
+    box_height = y_span * 0.065
+    margin = y_span * 0.02  # gap between stagger levels
+    margin_from_axis = y_span * 0.06  # gap from y_min / y_max edge
 
     # --- x-proximity threshold ---
     # Use 5% of the full plot x-range. When text boxes are close horizontally
@@ -662,7 +786,7 @@ def _stack_boxes_smart(boxes_list, y_min, y_max, y_span, position_type='bottom',
         x_close_threshold = (x_max - x_min) * 0.05
     else:
         all_times = [b['time'] for b in boxes_list]
-        x_spread  = max(all_times) - min(all_times) if len(all_times) > 1 else 1.0
+        x_spread = max(all_times) - min(all_times) if len(all_times) > 1 else 1.0
         x_close_threshold = max(x_spread * 0.5, 1.0)
 
     # Sort left-to-right for deterministic level assignment
@@ -676,7 +800,7 @@ def _stack_boxes_smart(boxes_list, y_min, y_max, y_span, position_type='bottom',
         for j in range(i):
             if abs(sorted_boxes[i]['time'] - sorted_boxes[j]['time']) < x_close_threshold:
                 occupied_levels.add(stagger_levels[j])
-        
+
         # Find the lowest available level (0, 1, 2, ...)
         level = 0
         while level in occupied_levels:
@@ -686,24 +810,22 @@ def _stack_boxes_smart(boxes_list, y_min, y_max, y_span, position_type='bottom',
     positioned_boxes = []
     for idx, box in enumerate(sorted_boxes):
         box_copy = box.copy()
-        level    = stagger_levels[idx]
+        level = stagger_levels[idx]
 
         if position_type == 'bottom':
-            y_center = (y_min + margin_from_axis
-                        + level * (box_height + margin)
-                        + box_height / 2)
+            y_center = y_min + margin_from_axis + level * (box_height + margin) + box_height / 2
         else:
-            y_center = (y_max - margin_from_axis
-                        - level * (box_height + margin)
-                        - box_height / 2)
+            y_center = y_max - margin_from_axis - level * (box_height + margin) - box_height / 2
 
-        box_copy.update({
-            'y_center':   y_center,
-            'vline_ymin': y_min,
-            'vline_ymax': y_max,
-            'va':         'center',
-            '_level':     level,
-        })
+        box_copy.update(
+            {
+                'y_center': y_center,
+                'vline_ymin': y_min,
+                'vline_ymax': y_max,
+                'va': 'center',
+                '_level': level,
+            }
+        )
         positioned_boxes.append(box_copy)
 
     return positioned_boxes
@@ -713,25 +835,44 @@ def _needed_levels(boxes_list, x_min, x_max):
     """Return the number of stagger levels needed (>=1) for a list of boxes."""
     if not boxes_list:
         return 0
-    dummy = _stack_boxes_smart(boxes_list, 0, 1, 1,
-                               position_type='bottom',
-                               x_min=x_min, x_max=x_max)
+    dummy = _stack_boxes_smart(
+        boxes_list, 0, 1, 1, position_type='bottom', x_min=x_min, x_max=x_max
+    )
     return max(b['_level'] for b in dummy) + 1
 
 
-def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=None,
-                                title=None, ylabel=None, xlabel='Time (s)',
-                                y_label_unit=None, figsize=(14, 7),
-                                show_settling_band=True, show_rise_time=True,
-                                show_rise_time_box=True, show_settling_time_box=True,
-                                y_initial=None, settling_threshold=0.01, axhline_color='#1a1a1a',
-                                curve_colors=None, setpoint_color='#d65a00',
-                                rise_time_color='#008000', settling_time_color='#cc0000',
-                                legend_loc='best', grid_alpha=0.3,
-                                tight_layout=True, dpi=None, savefig_path=None,
-                                box_margin=0,
-                                tr_box_y=None, ts_box_y=None,
-                                ylim=None):
+def plot_step_response_multiple(
+    time,
+    y_data_dict,
+    u,
+    step_time,
+    step_info_dict=None,
+    title=None,
+    ylabel=None,
+    xlabel='Time (s)',
+    y_label_unit=None,
+    figsize=(14, 7),
+    show_settling_band=True,
+    show_rise_time=True,
+    show_rise_time_box=True,
+    show_settling_time_box=True,
+    y_initial=None,
+    settling_threshold=0.01,
+    axhline_color='#1a1a1a',
+    curve_colors=None,
+    setpoint_color='#d65a00',
+    rise_time_color='#008000',
+    settling_time_color='#cc0000',
+    legend_loc='best',
+    grid_alpha=0.3,
+    tight_layout=True,
+    dpi=None,
+    savefig_path=None,
+    box_margin=0,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Plot multiple tuning curves on a shared step response axis.
 
     Parameters
@@ -822,27 +963,40 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
         first_info = list(step_info_dict.values())[0]
         if first_info is not None and hasattr(first_info, 'yfinal'):
             y_setpoint_final = first_info.yfinal
-            y_initial_global = first_info.y_initial if hasattr(first_info, 'y_initial') else float(list(y_data_dict.values())[0][0])
+            y_initial_global = (
+                first_info.y_initial
+                if hasattr(first_info, 'y_initial')
+                else float(list(y_data_dict.values())[0][0])
+            )
         else:
-            y_initial_global = y_initial if y_initial is not None else float(list(y_data_dict.values())[0][0])
+            y_initial_global = (
+                y_initial if y_initial is not None else float(list(y_data_dict.values())[0][0])
+            )
     else:
-        y_initial_global = y_initial if y_initial is not None else float(list(y_data_dict.values())[0][0])
+        y_initial_global = (
+            y_initial if y_initial is not None else float(list(y_data_dict.values())[0][0])
+        )
 
     delta_global = y_setpoint_final - y_initial_global
-    
+
     # Handle zero-delta case (matches step_info.py logic)
     is_zero_delta = abs(delta_global) < 1e-6
-    step_magnitude = abs(y_setpoint_final) if (is_zero_delta and y_setpoint_final != 0) else abs(delta_global)
+    step_magnitude = (
+        abs(y_setpoint_final) if (is_zero_delta and y_setpoint_final != 0) else abs(delta_global)
+    )
 
     default_colors = ['#0055cc', '#d65a00', '#008000', '#cc0000', '#9400d3', '#ff8c00']
     if curve_colors is None:
-        colors_dict = {label: default_colors[i % len(default_colors)]
-                      for i, label in enumerate(y_data_dict.keys())}
+        colors_dict = {
+            label: default_colors[i % len(default_colors)]
+            for i, label in enumerate(y_data_dict.keys())
+        }
     elif isinstance(curve_colors, dict):
         colors_dict = curve_colors
     else:
-        colors_dict = {label: curve_colors[i % len(curve_colors)]
-                      for i, label in enumerate(y_data_dict.keys())}
+        colors_dict = {
+            label: curve_colors[i % len(curve_colors)] for i, label in enumerate(y_data_dict.keys())
+        }
 
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -853,20 +1007,23 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
         color = colors_dict[label]
         ax.plot(time, y, label=f'{label}', color=color, linewidth=2.0)
 
-    ax.plot(time, u, label='Reference', linestyle='--',
-            color=setpoint_color, linewidth=1.5)
+    ax.plot(time, u, label='Reference', linestyle='--', color=setpoint_color, linewidth=1.5)
 
     if show_settling_band:
         y_band_low = y_setpoint_final - settling_threshold * step_magnitude
         y_band_high = y_setpoint_final + settling_threshold * step_magnitude
 
-        ax.axhline(y=y_band_low, color=axhline_color, linestyle=':',
-                   linewidth=1.5, alpha=0.7)
-        ax.axhline(y=y_band_high, color=axhline_color, linestyle=':',
-                   linewidth=1.5, alpha=0.7)
+        ax.axhline(y=y_band_low, color=axhline_color, linestyle=':', linewidth=1.5, alpha=0.7)
+        ax.axhline(y=y_band_high, color=axhline_color, linestyle=':', linewidth=1.5, alpha=0.7)
 
-        ax.fill_between(time, y_band_low, y_band_high, alpha=0.1, color=axhline_color,
-                        label=f'Settling Band (±{settling_threshold*100:.0f}%)')
+        ax.fill_between(
+            time,
+            y_band_low,
+            y_band_high,
+            alpha=0.1,
+            color=axhline_color,
+            label=f'Settling Band (±{settling_threshold * 100:.0f}%)',
+        )
 
     y_min, y_max = ax.get_ylim()
     y_span = y_max - y_min
@@ -887,7 +1044,9 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
             rise_time = metrics.RiseTime
 
             # FIX 1: Use specific properties from step_info of this curve for accurate markers
-            curve_y_initial = step_info.y_initial if hasattr(step_info, 'y_initial') else y_initial_global
+            curve_y_initial = (
+                step_info.y_initial if hasattr(step_info, 'y_initial') else y_initial_global
+            )
             curve_y_final = step_info.yfinal if hasattr(step_info, 'yfinal') else y_setpoint_final
             curve_delta = curve_y_final - curve_y_initial
 
@@ -911,12 +1070,14 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
                     # Fallback if signal doesn't reach 90%
                     rise_time_abs = safe_step_time + rise_time
 
-                rise_times_data.append({
-                    'label': label,
-                    'time': rise_time_abs,
-                    'value': rise_time,
-                    'color': colors_dict[label]
-                })
+                rise_times_data.append(
+                    {
+                        'label': label,
+                        'time': rise_time_abs,
+                        'value': rise_time,
+                        'color': colors_dict[label],
+                    }
+                )
 
         # Gather settling time from this curve's metrics (if present)
         settling_time = getattr(metrics, 'SettlingTime', np.nan)
@@ -924,27 +1085,41 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
             safe_step_time = step_time if step_time is not None else 0.0
             settling_time_abs = float(safe_step_time + settling_time)  # Cast to float
 
-            settling_times_data.append({
-                'label': label,
-                'time': settling_time_abs,
-                'value': settling_time,
-                'color': colors_dict[label]
-            })
+            settling_times_data.append(
+                {
+                    'label': label,
+                    'time': settling_time_abs,
+                    'value': settling_time,
+                    'color': colors_dict[label],
+                }
+            )
 
     # === Pre-compute stagger levels to correctly extend y-axis ===
     x_lo, x_hi = ax.get_xlim()
-    slot_frac   = 0.065 + 0.02   # box_height + margin (as fraction of y_span)
-    edge_frac   = 0.06            # margin_from_axis
-    clearance_frac = 0.15       # clearance between box and curves
+    slot_frac = 0.065 + 0.02  # box_height + margin (as fraction of y_span)
+    edge_frac = 0.06  # margin_from_axis
+    clearance_frac = 0.15  # clearance between box and curves
 
     y_min_now, y_max_now = ax.get_ylim()
     y_span_now = y_max_now - y_min_now
 
-    n_tr = _needed_levels(rise_times_data, x_lo, x_hi) if (rise_times_data and show_rise_time_box) else 0
-    n_ts = _needed_levels(settling_times_data, x_lo, x_hi) if (settling_times_data and show_settling_time_box) else 0
+    n_tr = (
+        _needed_levels(rise_times_data, x_lo, x_hi)
+        if (rise_times_data and show_rise_time_box)
+        else 0
+    )
+    n_ts = (
+        _needed_levels(settling_times_data, x_lo, x_hi)
+        if (settling_times_data and show_settling_time_box)
+        else 0
+    )
 
-    space_bot = (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span_now if n_tr > 0 else 0
-    space_top = (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span_now if n_ts > 0 else 0
+    space_bot = (
+        (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span_now if n_tr > 0 else 0
+    )
+    space_top = (
+        (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span_now if n_ts > 0 else 0
+    )
 
     ax.set_ylim(y_min_now - space_bot, y_max_now + space_top)
 
@@ -955,16 +1130,39 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
             ax.set_ylim(ylim)
             y_min, y_max = ylim
         y_span = y_max - y_min
-        positioned_boxes = _stack_boxes_smart(rise_times_data, y_min, y_max, y_span,
-                                              position_type='bottom', x_min=x_lo, x_max=x_hi)
+        positioned_boxes = _stack_boxes_smart(
+            rise_times_data, y_min, y_max, y_span, position_type='bottom', x_min=x_lo, x_max=x_hi
+        )
         for i, box in enumerate(positioned_boxes):
-            tr_text = f"$t_R$ = {box['value']:.0f} s\n({box['label']})"
-            ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'], linestyles='--', linewidth=1.0, alpha=0.5, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(tr_box_y, i, box['y_center']), s=tr_text,
-                   color=box['color'], fontsize=9, fontweight='bold',
-                   ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                            edgecolor=box['color'], alpha=1.0, linewidth=1.5))
+            tr_text = f'$t_R$ = {box["value"]:.0f} s\n({box["label"]})'
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min,
+                ymax=y_max,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.0,
+                alpha=0.5,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(tr_box_y, i, box['y_center']),
+                s=tr_text,
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.4',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # Plot settling time boxes
     if settling_times_data and show_settling_time_box:
@@ -973,16 +1171,39 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
             ax.set_ylim(ylim)
             y_min, y_max = ylim
         y_span = y_max - y_min
-        positioned_boxes = _stack_boxes_smart(settling_times_data, y_min, y_max, y_span,
-                                              position_type='top', x_min=x_lo, x_max=x_hi)
+        positioned_boxes = _stack_boxes_smart(
+            settling_times_data, y_min, y_max, y_span, position_type='top', x_min=x_lo, x_max=x_hi
+        )
         for i, box in enumerate(positioned_boxes):
-            ts_text = f"$t_S$ = {box['value']:.0f} s\n({box['label']})"
-            ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'], linestyles=':', linewidth=1.0, alpha=0.5, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']), s=ts_text,
-                   color=box['color'], fontsize=9, fontweight='bold',
-                   ha='center', va=box['va'], zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                            edgecolor=box['color'], alpha=1.0, linewidth=1.5))
+            ts_text = f'$t_S$ = {box["value"]:.0f} s\n({box["label"]})'
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min,
+                ymax=y_max,
+                colors=box['color'],
+                linestyles=':',
+                linewidth=1.0,
+                alpha=0.5,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                s=ts_text,
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va=box['va'],
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.4',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # Formatting and axis adjustment...
     if ylabel:
@@ -992,8 +1213,17 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
     # if title is not None:  # no title per publication style
     #     ax.set_title(title, fontsize=13, fontweight='bold')
 
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09), ncol=10, borderaxespad=0,
-             frameon=True, fontsize=9, framealpha=0.95, edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=10,
+        borderaxespad=0,
+        frameon=True,
+        fontsize=9,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
 
     ax.grid(True, alpha=grid_alpha)
     for spine in ax.spines.values():
@@ -1012,19 +1242,31 @@ def plot_step_response_multiple(time, y_data_dict, u, step_time, step_info_dict=
         if dpi is None:
             dpi = 600
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, ax
 
 
-def plot_tuning_comparison(tuning_scenarios, time, step_time,
-                          title=None, ylabel=None, y_label_unit=None,
-                          figsize=(14, 7), settling_threshold=0.02,
-                          show_rise_time_box=True, show_settling_time_box=True,
-                          legend_loc='best', grid_alpha=0.3,
-                          tight_layout=True, dpi=None, savefig_path=None,
-                          tr_box_y=None, ts_box_y=None,
-                          ylim=None):
+def plot_tuning_comparison(
+    tuning_scenarios,
+    time,
+    step_time,
+    title=None,
+    ylabel=None,
+    y_label_unit=None,
+    figsize=(14, 7),
+    settling_threshold=0.02,
+    show_rise_time_box=True,
+    show_settling_time_box=True,
+    legend_loc='best',
+    grid_alpha=0.3,
+    tight_layout=True,
+    dpi=None,
+    savefig_path=None,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Plot and compare multiple tuning scenarios on a single step response axis.
 
     Parameters
@@ -1095,7 +1337,9 @@ def plot_tuning_comparison(tuning_scenarios, time, step_time,
         y_initial = scenario_data.get('y_initial', float(y[0]))
 
         idx_step = np.searchsorted(time, step_time)
-        y_sp = float(setpoint[idx_step:].mean()) if idx_step < len(setpoint) else float(setpoint[-1])
+        y_sp = (
+            float(setpoint[idx_step:].mean()) if idx_step < len(setpoint) else float(setpoint[-1])
+        )
 
         color_pv = colors_pv[idx % len(colors_pv)]
         color_sp = colors_sp[idx % len(colors_sp)]
@@ -1108,44 +1352,77 @@ def plot_tuning_comparison(tuning_scenarios, time, step_time,
         # FIX 2: Collect box data for staggered alignment instead of plotting directly to prevent overlap
         if step_info is not None and hasattr(step_info, 'metrics'):
             metrics = step_info.metrics
-            
+
             if not np.isnan(metrics.RiseTime):
                 # Find the appropriate marker with accurate logic
-                curve_delta = step_info.yfinal - step_info.y_initial if hasattr(step_info, 'y_initial') else y_sp - y_initial
-                
+                curve_delta = (
+                    step_info.yfinal - step_info.y_initial
+                    if hasattr(step_info, 'y_initial')
+                    else y_sp - y_initial
+                )
+
                 # Only compute rise time marker if meaningful delta (not disturbance rejection)
                 if abs(curve_delta) > 1e-6:
-                    threshold_90 = (step_info.y_initial if hasattr(step_info, 'y_initial') else y_initial) + 0.9 * curve_delta
+                    threshold_90 = (
+                        step_info.y_initial if hasattr(step_info, 'y_initial') else y_initial
+                    ) + 0.9 * curve_delta
                     y_slice = y[idx_step:]
-                    crossing = y_slice >= threshold_90 if curve_delta > 0 else y_slice <= threshold_90
-                    
-                    crossing_indices = np.nonzero(crossing)[0]
-                    rt_abs = time[idx_step + crossing_indices[0]] if crossing_indices.size > 0 else step_time + metrics.RiseTime
+                    crossing = (
+                        y_slice >= threshold_90 if curve_delta > 0 else y_slice <= threshold_90
+                    )
 
-                    rise_times_data.append({
-                        'label': tuning_name, 'time': rt_abs, 'value': metrics.RiseTime, 'color': color_tr
-                    })
+                    crossing_indices = np.nonzero(crossing)[0]
+                    rt_abs = (
+                        time[idx_step + crossing_indices[0]]
+                        if crossing_indices.size > 0
+                        else step_time + metrics.RiseTime
+                    )
+
+                    rise_times_data.append(
+                        {
+                            'label': tuning_name,
+                            'time': rt_abs,
+                            'value': metrics.RiseTime,
+                            'color': color_tr,
+                        }
+                    )
 
             if not np.isnan(metrics.SettlingTime):
-                settling_times_data.append({
-                    'label': tuning_name, 'time': step_time + metrics.SettlingTime, 
-                    'value': metrics.SettlingTime, 'color': color_ts
-                })
+                settling_times_data.append(
+                    {
+                        'label': tuning_name,
+                        'time': step_time + metrics.SettlingTime,
+                        'value': metrics.SettlingTime,
+                        'color': color_ts,
+                    }
+                )
 
     x_lo, x_hi = ax.get_xlim()
-    slot_frac   = 0.065 + 0.02
-    edge_frac   = 0.06
+    slot_frac = 0.065 + 0.02
+    edge_frac = 0.06
     clearance_frac = 0.15
 
     # Pre-extend y-axis based on actual stagger levels needed
     y_min, y_max = ax.get_ylim()
     y_span = y_max - y_min
 
-    n_tr = _needed_levels(rise_times_data, x_lo, x_hi) if (rise_times_data and show_rise_time_box) else 0
-    n_ts = _needed_levels(settling_times_data, x_lo, x_hi) if (settling_times_data and show_settling_time_box) else 0
+    n_tr = (
+        _needed_levels(rise_times_data, x_lo, x_hi)
+        if (rise_times_data and show_rise_time_box)
+        else 0
+    )
+    n_ts = (
+        _needed_levels(settling_times_data, x_lo, x_hi)
+        if (settling_times_data and show_settling_time_box)
+        else 0
+    )
 
-    space_bot = (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_tr > 0 else 0
-    space_top = (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_ts > 0 else 0
+    space_bot = (
+        (edge_frac + n_tr * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_tr > 0 else 0
+    )
+    space_top = (
+        (edge_frac + n_ts * slot_frac + 0.065 / 2 + clearance_frac) * y_span if n_ts > 0 else 0
+    )
 
     ax.set_ylim(y_min - space_bot, y_max + space_top)
 
@@ -1157,25 +1434,71 @@ def plot_tuning_comparison(tuning_scenarios, time, step_time,
 
     # Plot rise time boxes
     if rise_times_data and show_rise_time_box:
-        positioned_boxes = _stack_boxes_smart(rise_times_data, y_min, y_max, y_span,
-                                              position_type='bottom', x_min=x_lo, x_max=x_hi)
+        positioned_boxes = _stack_boxes_smart(
+            rise_times_data, y_min, y_max, y_span, position_type='bottom', x_min=x_lo, x_max=x_hi
+        )
         for i, box in enumerate(positioned_boxes):
-            ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'], linestyles='--', linewidth=1.5, alpha=0.6, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(tr_box_y, i, box['y_center']),
-                   s=f'$t_R$={box["value"]:.0f}s\n({box["label"]})',
-                   color=box['color'], fontsize=9, fontweight='bold', ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.25', facecolor='white', edgecolor=box['color'], alpha=1.0))
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min,
+                ymax=y_max,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.5,
+                alpha=0.6,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(tr_box_y, i, box['y_center']),
+                s=f'$t_R$={box["value"]:.0f}s\n({box["label"]})',
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.25',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                },
+            )
 
     # Plot settling time boxes
     if settling_times_data and show_settling_time_box:
-        positioned_boxes = _stack_boxes_smart(settling_times_data, y_min, y_max, y_span,
-                                              position_type='top', x_min=x_lo, x_max=x_hi)
+        positioned_boxes = _stack_boxes_smart(
+            settling_times_data, y_min, y_max, y_span, position_type='top', x_min=x_lo, x_max=x_hi
+        )
         for i, box in enumerate(positioned_boxes):
-            ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'], linestyles='--', linewidth=1.5, alpha=0.6, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']),
-                   s=f'$t_S$={box["value"]:.0f}s\n({box["label"]})',
-                   color=box['color'], fontsize=9, fontweight='bold', ha='center', va=box['va'], zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.25', facecolor='white', edgecolor=box['color'], alpha=1.0))
+            ax.vlines(
+                x=box['time'],
+                ymin=y_min,
+                ymax=y_max,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.5,
+                alpha=0.6,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                s=f'$t_S$={box["value"]:.0f}s\n({box["label"]})',
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va=box['va'],
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.25',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                },
+            )
 
     if ylabel is not None:
         ax.set_ylabel(f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12)
@@ -1183,9 +1506,16 @@ def plot_tuning_comparison(tuning_scenarios, time, step_time,
     # if title is not None:  # no title per publication style
     #     ax.set_title(title, fontsize=13, fontweight='bold')
 
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09),
-              ncol=6, fontsize=10, frameon=True, framealpha=0.95,
-              edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=6,
+        fontsize=10,
+        frameon=True,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
     ax.grid(True, alpha=grid_alpha)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -1196,16 +1526,26 @@ def plot_tuning_comparison(tuning_scenarios, time, step_time,
         fig.tight_layout()
     if savefig_path is not None:
         _save_fig(fig, savefig_path, dpi or 600)
-        
+
     return fig, ax
 
 
-def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
-                           cols=2, title_prefix='', settling_threshold=0.02,
-                           show_rise_time_box=True, show_settling_time_box=True,
-                           dpi=None, savefig_path=None,
-                           tr_box_y=None, ts_box_y=None,
-                           ylim=None):
+def compare_step_responses(
+    loops_dict,
+    time,
+    step_time,
+    figsize=(14, 7),
+    cols=2,
+    title_prefix='',
+    settling_threshold=0.02,
+    show_rise_time_box=True,
+    show_settling_time_box=True,
+    dpi=None,
+    savefig_path=None,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Create multi-panel comparison of multiple control loops.
 
     Parameters
@@ -1272,7 +1612,7 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
     else:
         axes = axes.flatten()
 
-    for idx, (loop_name, loop_data) in enumerate(loops_dict.items()):
+    for idx, (_loop_name, loop_data) in enumerate(loops_dict.items()):
         ax = axes[idx]
         y = loop_data.get('y')
         setpoint = loop_data.get('setpoint')
@@ -1280,15 +1620,20 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
 
         # Plot on this axis
         ax.plot(time, y, label='PV', linewidth=2.0, color='#0055cc')
-        ax.plot(time, setpoint, label='SP', linestyle='--',
-                linewidth=1.5, color='#d65a00')
+        ax.plot(time, setpoint, label='SP', linestyle='--', linewidth=1.5, color='#d65a00')
 
         # Extract setpoint value
         idx_step = np.searchsorted(time, step_time)
-        y_sp = float(setpoint[idx_step:].mean()) if idx_step < len(setpoint) else float(setpoint[-1])
+        y_sp = (
+            float(setpoint[idx_step:].mean()) if idx_step < len(setpoint) else float(setpoint[-1])
+        )
 
         # Calculate step magnitude for settling band
-        if step_info is not None and hasattr(step_info, 'yfinal') and hasattr(step_info, 'y_initial'):
+        if (
+            step_info is not None
+            and hasattr(step_info, 'yfinal')
+            and hasattr(step_info, 'y_initial')
+        ):
             y_sp = step_info.yfinal
             y_init = step_info.y_initial
         else:
@@ -1324,13 +1669,25 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
                 if not np.isnan(metrics.SettlingTime):
                     ts_abs = step_time + metrics.SettlingTime
                     positions = _calculate_box_positions(
-                        tr_abs, ts_abs, y, setpoint,
-                        y_min, y_max, step_time, settling_threshold=settling_threshold
+                        tr_abs,
+                        ts_abs,
+                        y,
+                        setpoint,
+                        y_min,
+                        y_max,
+                        step_time,
+                        settling_threshold=settling_threshold,
                     )
                 else:
                     positions = _calculate_box_positions(
-                        tr_abs, tr_abs + 1000, y, setpoint,
-                        y_min, y_max, step_time, settling_threshold=settling_threshold
+                        tr_abs,
+                        tr_abs + 1000,
+                        y,
+                        setpoint,
+                        y_min,
+                        y_max,
+                        step_time,
+                        settling_threshold=settling_threshold,
                     )
 
                 tr_y = positions['tr_y']
@@ -1339,13 +1696,34 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
                 # Vline crosses full plot height
                 _tr_vmin = y_min
                 _tr_vmax = y_max
-                ax.vlines(x=tr_abs, ymin=_tr_vmin, ymax=_tr_vmax, colors='#008000',
-                         linestyles='--', linewidth=1.0, alpha=0.6, zorder=2)
+                ax.vlines(
+                    x=tr_abs,
+                    ymin=_tr_vmin,
+                    ymax=_tr_vmax,
+                    colors='#008000',
+                    linestyles='--',
+                    linewidth=1.0,
+                    alpha=0.6,
+                    zorder=2,
+                )
 
-                ax.text(x=tr_abs, y=_resolve_box_y(tr_box_y, 0, tr_y), s=f'$t_R$={metrics.RiseTime:.0f}s',
-                       color='#008000', fontsize=9, ha='center', va=tr_va, zorder=3,
-                       bbox=dict(boxstyle='round,pad=0.25', facecolor='white',
-                                edgecolor='#008000', alpha=1.0, linewidth=1.0))
+                ax.text(
+                    x=tr_abs,
+                    y=_resolve_box_y(tr_box_y, 0, tr_y),
+                    s=f'$t_R$={metrics.RiseTime:.0f}s',
+                    color='#008000',
+                    fontsize=9,
+                    ha='center',
+                    va=tr_va,
+                    zorder=3,
+                    bbox={
+                        'boxstyle': 'round,pad=0.25',
+                        'facecolor': 'white',
+                        'edgecolor': '#008000',
+                        'alpha': 1.0,
+                        'linewidth': 1.0,
+                    },
+                )
 
             # Settling time
             if not np.isnan(metrics.SettlingTime) and show_settling_time_box:
@@ -1355,13 +1733,25 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
                 if not np.isnan(metrics.RiseTime):
                     tr_abs = step_time + metrics.RiseTime
                     positions = _calculate_box_positions(
-                        tr_abs, ts_abs, y, setpoint,
-                        y_min, y_max, step_time, settling_threshold=0.02
+                        tr_abs,
+                        ts_abs,
+                        y,
+                        setpoint,
+                        y_min,
+                        y_max,
+                        step_time,
+                        settling_threshold=0.02,
                     )
                 else:
                     positions = _calculate_box_positions(
-                        ts_abs - 1000, ts_abs, y, setpoint,
-                        y_min, y_max, step_time, settling_threshold=0.02
+                        ts_abs - 1000,
+                        ts_abs,
+                        y,
+                        setpoint,
+                        y_min,
+                        y_max,
+                        step_time,
+                        settling_threshold=0.02,
                     )
 
                 ts_y = positions['ts_y']
@@ -1370,13 +1760,34 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
                 # Vline crosses full plot height
                 _ts_vmin = y_min
                 _ts_vmax = y_max
-                ax.vlines(x=ts_abs, ymin=_ts_vmin, ymax=_ts_vmax, colors='#cc0000',
-                         linestyles='--', linewidth=1.0, alpha=0.6, zorder=2)
+                ax.vlines(
+                    x=ts_abs,
+                    ymin=_ts_vmin,
+                    ymax=_ts_vmax,
+                    colors='#cc0000',
+                    linestyles='--',
+                    linewidth=1.0,
+                    alpha=0.6,
+                    zorder=2,
+                )
 
-                ax.text(x=ts_abs, y=_resolve_box_y(ts_box_y, 0, ts_y), s=f'$t_S$={metrics.SettlingTime:.0f}s',
-                       color='#cc0000', fontsize=9, ha='center', va=ts_va, zorder=3,
-                       bbox=dict(boxstyle='round,pad=0.25', facecolor='white',
-                                edgecolor='#cc0000', alpha=1.0, linewidth=1.0))
+                ax.text(
+                    x=ts_abs,
+                    y=_resolve_box_y(ts_box_y, 0, ts_y),
+                    s=f'$t_S$={metrics.SettlingTime:.0f}s',
+                    color='#cc0000',
+                    fontsize=9,
+                    ha='center',
+                    va=ts_va,
+                    zorder=3,
+                    bbox={
+                        'boxstyle': 'round,pad=0.25',
+                        'facecolor': 'white',
+                        'edgecolor': '#cc0000',
+                        'alpha': 1.0,
+                        'linewidth': 1.0,
+                    },
+                )
 
         # Formatting
         # ax.set_title(...)  # no title per publication style
@@ -1397,22 +1808,34 @@ def compare_step_responses(loops_dict, time, step_time, figsize=(14, 7),
         if dpi is None:
             dpi = 600
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Comparison figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Comparison figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, axes
 
 
-def plot_multi_step_response(time, y_data_dict, u_dict, steps_config, 
-                             step_info_dict=None, title=None, ylabel=None, 
-                             figsize=(14, 7), settling_threshold=0.02,
-                             curve_colors=None, setpoint_color='#1a1a1a',
-                             show_boxes=None, savefig_path=None, dpi=600,
-                             tr_box_y=None, ts_box_y=None,
-                             ylim=None):
+def plot_multi_step_response(
+    time,
+    y_data_dict,
+    u_dict,
+    steps_config,
+    step_info_dict=None,
+    title=None,
+    ylabel=None,
+    figsize=(14, 7),
+    settling_threshold=0.02,
+    curve_colors=None,
+    setpoint_color='#1a1a1a',
+    show_boxes=None,
+    savefig_path=None,
+    dpi=600,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Plot multiple steps (disturbance + setpoint) in single figure.
-    
+
     Matches step_info.py logic for handling multiple evaluation windows.
-    
+
     Parameters
     ----------
     time : array_like
@@ -1422,7 +1845,7 @@ def plot_multi_step_response(time, y_data_dict, u_dict, steps_config,
     setpoint_dict : dict
         {label: setpoint_array} for each tuning method
     steps_config : dict
-        {step_name: {'time': float, 'y_band_low': float, 'y_band_high': float, 
+        {step_name: {'time': float, 'y_band_low': float, 'y_band_high': float,
                      'label_suffix': str}}
     step_info_dict : dict, optional
         {label: {step_name: StepInfo}} nested dict for metrics
@@ -1447,189 +1870,273 @@ def plot_multi_step_response(time, y_data_dict, u_dict, steps_config,
         Path to save figure
     dpi : int, optional
         DPI for saved figure. Default: 600
-        
+
     Returns
     -------
     fig, ax : matplotlib Figure and Axes
     """
     time = np.asarray(time)
-    
+
     # Default box visibility
     if show_boxes is None:
-        show_boxes = {
-            'dist_ts': True,
-            'sp_tr': True,
-            'sp_ts': True
-        }
-    
+        show_boxes = {'dist_ts': True, 'sp_tr': True, 'sp_ts': True}
+
     # Default colors
     if curve_colors is None:
-        curve_colors = {
-            'Syn': '#0055cc',
-            'IAE': '#d65a00',
-            'QDR': '#008000'
-        }
-    
+        curve_colors = {'Syn': '#0055cc', 'IAE': '#d65a00', 'QDR': '#008000'}
+
     # Create figure
     fig, ax = plt.subplots(figsize=figsize)
-    
+
     # Plot curves
     for label, y in y_data_dict.items():
-        ax.plot(time, y, label=f'{label}', color=curve_colors.get(label, '#000000'), 
-                linewidth=2.0)
-    
+        ax.plot(time, y, label=f'{label}', color=curve_colors.get(label, '#000000'), linewidth=2.0)
+
     # Plot input(s)
-    for label, u in u_dict.items():
+    for _label, u in u_dict.items():
         ax.plot(time, u, linestyle='--', color=setpoint_color, linewidth=1.5, alpha=0.7)
-    
+
     # Add settling bands for each step
-    for step_name, step_info in steps_config.items():
+    for _step_name, step_info in steps_config.items():
         y_band_low = step_info['y_band_low']
         y_band_high = step_info['y_band_high']
         step_time = step_info['time']
         end_time = step_info.get('end_time', time[-1])
-        
+
         # Time window for band
         idx_start = np.searchsorted(time, step_time)
         idx_end = np.searchsorted(time, end_time)
         time_window = time[idx_start:idx_end]
-        
+
         ax.axhline(y=y_band_low, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
         ax.axhline(y=y_band_high, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
-        ax.fill_between(time_window, y_band_low, y_band_high, alpha=0.08, 
-                        color='#1a1a1a', label=f"{step_info['label_suffix']} Band (±2%)")
-    
+        ax.fill_between(
+            time_window,
+            y_band_low,
+            y_band_high,
+            alpha=0.08,
+            color='#1a1a1a',
+            label=f'{step_info["label_suffix"]} Band (±2%)',
+        )
+
     # Add annotation boxes
     if step_info_dict is not None:
         if ylim is not None:
             ax.set_ylim(ylim)
         y_min, y_max = ax.get_ylim()
-        
+
         # Collect all boxes data
-        boxes_data = {
-            'dist_ts': [],
-            'sp_tr': [],
-            'sp_ts': []
-        }
-        
+        boxes_data = {'dist_ts': [], 'sp_tr': [], 'sp_ts': []}
+
         # Disturbance settling times
         if show_boxes.get('dist_ts', True):
             if 'Disturbance' in step_info_dict:
                 for idx, (label, si) in enumerate(step_info_dict['Disturbance'].items()):
                     if not np.isnan(si.metrics.SettlingTime):
-                        boxes_data['dist_ts'].append({
-                            'label': label,
-                            'time': steps_config.get('Disturbance', {}).get('time', 600) + si.metrics.SettlingTime,
-                            'value': si.metrics.SettlingTime,
-                            'color': curve_colors.get(label, '#000000'),
-                            'order': idx
-                        })
-        
+                        boxes_data['dist_ts'].append(
+                            {
+                                'label': label,
+                                'time': steps_config.get('Disturbance', {}).get('time', 600)
+                                + si.metrics.SettlingTime,
+                                'value': si.metrics.SettlingTime,
+                                'color': curve_colors.get(label, '#000000'),
+                                'order': idx,
+                            }
+                        )
+
         # Setpoint rise times
         if show_boxes.get('sp_tr', True):
             if 'Setpoint' in step_info_dict:
                 for idx, (label, si) in enumerate(step_info_dict['Setpoint'].items()):
                     if not np.isnan(si.metrics.RiseTime):
-                        boxes_data['sp_tr'].append({
-                            'label': label,
-                            'time': steps_config.get('Setpoint', {}).get('time', 20600) + si.metrics.RiseTime,
-                            'value': si.metrics.RiseTime,
-                            'color': curve_colors.get(label, '#000000'),
-                            'order': idx
-                        })
-        
+                        boxes_data['sp_tr'].append(
+                            {
+                                'label': label,
+                                'time': steps_config.get('Setpoint', {}).get('time', 20600)
+                                + si.metrics.RiseTime,
+                                'value': si.metrics.RiseTime,
+                                'color': curve_colors.get(label, '#000000'),
+                                'order': idx,
+                            }
+                        )
+
         # Setpoint settling times
         if show_boxes.get('sp_ts', True):
             if 'Setpoint' in step_info_dict:
                 for idx, (label, si) in enumerate(step_info_dict['Setpoint'].items()):
                     if not np.isnan(si.metrics.SettlingTime):
-                        boxes_data['sp_ts'].append({
-                            'label': label,
-                            'time': steps_config.get('Setpoint', {}).get('time', 20600) + si.metrics.SettlingTime,
-                            'value': si.metrics.SettlingTime,
-                            'color': curve_colors.get(label, '#000000'),
-                            'order': idx
-                        })
-        
+                        boxes_data['sp_ts'].append(
+                            {
+                                'label': label,
+                                'time': steps_config.get('Setpoint', {}).get('time', 20600)
+                                + si.metrics.SettlingTime,
+                                'value': si.metrics.SettlingTime,
+                                'color': curve_colors.get(label, '#000000'),
+                                'order': idx,
+                            }
+                        )
+
         # Plot disturbance settling times (bottom, staggered)
         if boxes_data['dist_ts']:
             y_span_curr = y_max - y_min
-            positioned = _stack_boxes_smart(boxes_data['dist_ts'], y_min, y_max, y_span_curr,
-                                            position_type='bottom')
+            positioned = _stack_boxes_smart(
+                boxes_data['dist_ts'], y_min, y_max, y_span_curr, position_type='bottom'
+            )
             for i, box in enumerate(positioned):
-                ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'],
-                         linestyles='--', linewidth=1.0, alpha=0.5, zorder=2)
-                ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']),
-                       s=f"$t_S$ ({box['label']})\n{box['value']:.0f}s",
-                       color=box['color'], fontsize=9, ha='center', va='center', zorder=3,
-                       bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                                edgecolor=box['color'], alpha=1.0, linewidth=1.5))
-        
+                ax.vlines(
+                    x=box['time'],
+                    ymin=y_min,
+                    ymax=y_max,
+                    colors=box['color'],
+                    linestyles='--',
+                    linewidth=1.0,
+                    alpha=0.5,
+                    zorder=2,
+                )
+                ax.text(
+                    x=box['time'],
+                    y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                    s=f'$t_S$ ({box["label"]})\n{box["value"]:.0f}s',
+                    color=box['color'],
+                    fontsize=9,
+                    ha='center',
+                    va='center',
+                    zorder=3,
+                    bbox={
+                        'boxstyle': 'round,pad=0.4',
+                        'facecolor': 'white',
+                        'edgecolor': box['color'],
+                        'alpha': 1.0,
+                        'linewidth': 1.5,
+                    },
+                )
+
         # Plot setpoint rise times (top, staggered)
         if boxes_data['sp_tr']:
             y_span_curr = y_max - y_min
-            positioned = _stack_boxes_smart(boxes_data['sp_tr'], y_min, y_max, y_span_curr,
-                                            position_type='top')
+            positioned = _stack_boxes_smart(
+                boxes_data['sp_tr'], y_min, y_max, y_span_curr, position_type='top'
+            )
             for i, box in enumerate(positioned):
-                ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'],
-                         linestyles='--', linewidth=1.0, alpha=0.5, zorder=2)
-                ax.text(x=box['time'], y=_resolve_box_y(tr_box_y, i, box['y_center']),
-                       s=f"$t_R$ ({box['label']})\n{box['value']:.0f}s",
-                       color=box['color'], fontsize=9, ha='center', va='center', zorder=3,
-                       bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                                edgecolor=box['color'], alpha=1.0, linewidth=1.5))
-        
+                ax.vlines(
+                    x=box['time'],
+                    ymin=y_min,
+                    ymax=y_max,
+                    colors=box['color'],
+                    linestyles='--',
+                    linewidth=1.0,
+                    alpha=0.5,
+                    zorder=2,
+                )
+                ax.text(
+                    x=box['time'],
+                    y=_resolve_box_y(tr_box_y, i, box['y_center']),
+                    s=f'$t_R$ ({box["label"]})\n{box["value"]:.0f}s',
+                    color=box['color'],
+                    fontsize=9,
+                    ha='center',
+                    va='center',
+                    zorder=3,
+                    bbox={
+                        'boxstyle': 'round,pad=0.4',
+                        'facecolor': 'white',
+                        'edgecolor': box['color'],
+                        'alpha': 1.0,
+                        'linewidth': 1.5,
+                    },
+                )
+
         # Plot setpoint settling times (top, staggered below sp_tr)
         if boxes_data['sp_ts']:
             y_span_curr = y_max - y_min
             # Count how many top-level stagger slots are used by sp_tr
-            num_tr_levels = max([0] + [b.get('_level', 0) for b in boxes_data['sp_tr']]) + 1 if boxes_data['sp_tr'] else 0
+            num_tr_levels = (
+                max([0] + [b.get('_level', 0) for b in boxes_data['sp_tr']]) + 1
+                if boxes_data['sp_tr']
+                else 0
+            )
             # Position sp_ts below sp_tr by passing a shifted y_max
             offset = num_tr_levels * (y_span_curr * 0.06 + y_span_curr * 0.12)
             adjusted_y_max = y_max - offset
-            positioned = _stack_boxes_smart(boxes_data['sp_ts'], y_min, adjusted_y_max, y_span_curr,
-                                            position_type='top')
+            positioned = _stack_boxes_smart(
+                boxes_data['sp_ts'], y_min, adjusted_y_max, y_span_curr, position_type='top'
+            )
             for i, box in enumerate(positioned):
-                ax.vlines(x=box['time'], ymin=y_min, ymax=y_max, colors=box['color'],
-                         linestyles=':', linewidth=1.0, alpha=0.5, zorder=2)
-                ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']),
-                       s=f"$t_S$ ({box['label']})\n{box['value']:.0f}s",
-                       color=box['color'], fontsize=8, ha='center', va='center', zorder=3,
-                       bbox=dict(boxstyle='round,pad=0.3', facecolor='lightyellow',
-                                edgecolor=box['color'], alpha=1.0, linewidth=1.2))
-    
+                ax.vlines(
+                    x=box['time'],
+                    ymin=y_min,
+                    ymax=y_max,
+                    colors=box['color'],
+                    linestyles=':',
+                    linewidth=1.0,
+                    alpha=0.5,
+                    zorder=2,
+                )
+                ax.text(
+                    x=box['time'],
+                    y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                    s=f'$t_S$ ({box["label"]})\n{box["value"]:.0f}s',
+                    color=box['color'],
+                    fontsize=8,
+                    ha='center',
+                    va='center',
+                    zorder=3,
+                    bbox={
+                        'boxstyle': 'round,pad=0.3',
+                        'facecolor': 'lightyellow',
+                        'edgecolor': box['color'],
+                        'alpha': 1.0,
+                        'linewidth': 1.2,
+                    },
+                )
+
     # Formatting
     ax.set_xlabel('Time (s)', fontsize=12, fontweight='bold')
     if ylabel:
         ax.set_ylabel(ylabel, fontsize=12, fontweight='bold')
     # if title:  # no title per publication style
     #     ax.set_title(title, fontsize=13, fontweight='bold')
-    
+
     ax.legend(loc='upper left', fontsize=10, frameon=False, framealpha=0.95)
     ax.grid(True, alpha=0.3)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    
+
     plt.tight_layout()
-    
+
     if savefig_path is not None:
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
-    
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
+
     return fig, ax
 
 
-def plot_dual_response(time, y_data_dict, u_array,
-                            step1_time, step1_end_time, step2_time,
-                            step_info_dict=None,
-                            title=None, ylabel=None, figsize=(14, 7),
-                            step1_name='Disturbance', step2_name='Setpoint',
-                            step1_threshold=0.02, step2_threshold=0.02,
-                            curve_colors=None, setpoint_color='#1a1a1a',
-                            show_step1_ts=True, show_step2_tr=True, show_step2_ts=True,
-                            savefig_path=None, dpi=600,
-                            tr_box_y=None, ts_box_y=None,
-                            ylim=None):
+def plot_dual_response(
+    time,
+    y_data_dict,
+    u_array,
+    step1_time,
+    step1_end_time,
+    step2_time,
+    step_info_dict=None,
+    title=None,
+    ylabel=None,
+    figsize=(14, 7),
+    step1_name='Disturbance',
+    step2_name='Setpoint',
+    step1_threshold=0.02,
+    step2_threshold=0.02,
+    curve_colors=None,
+    setpoint_color='#1a1a1a',
+    show_step1_ts=True,
+    show_step2_tr=True,
+    show_step2_ts=True,
+    savefig_path=None,
+    dpi=600,
+    tr_box_y=None,
+    ts_box_y=None,
+    ylim=None,
+):
     """Plot dual-step response (e.g., disturbance rejection + setpoint tracking).
 
     Specifically designed for comparing multiple tuning methods across two separate
@@ -1705,11 +2212,7 @@ def plot_dual_response(time, y_data_dict, u_array,
 
     # Default colors
     if curve_colors is None:
-        curve_colors = {
-            'Syn': '#0055cc',
-            'IAE': '#d65a00',
-            'QDR': '#008000'
-        }
+        curve_colors = {'Syn': '#0055cc', 'IAE': '#d65a00', 'QDR': '#008000'}
 
     # Create figure
     fig, ax = plt.subplots(figsize=figsize)
@@ -1721,8 +2224,7 @@ def plot_dual_response(time, y_data_dict, u_array,
         ax.plot(time, y, label=label, color=color, linewidth=2.0)
 
     # Plot input
-    ax.plot(time, u_array, label='Reference', linestyle='--',
-            color=setpoint_color, linewidth=1.5)
+    ax.plot(time, u_array, label='Reference', linestyle='--', color=setpoint_color, linewidth=1.5)
 
     # Get y-axis limits
     y_min, y_max = ax.get_ylim()
@@ -1759,8 +2261,14 @@ def plot_dual_response(time, y_data_dict, u_array,
     time_window_1 = time[idx_step1:idx_step1_end]
     ax.axhline(y=y_band_low_1, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
     ax.axhline(y=y_band_high_1, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
-    ax.fill_between(time_window_1, y_band_low_1, y_band_high_1, alpha=0.08,
-                    color='#1a1a1a', label=f'Step 1 Band (±{step1_threshold*100:.0f}%)')
+    ax.fill_between(
+        time_window_1,
+        y_band_low_1,
+        y_band_high_1,
+        alpha=0.08,
+        color='#1a1a1a',
+        label=f'Step 1 Band (±{step1_threshold * 100:.0f}%)',
+    )
 
     # === STEP 2: Setpoint Response ===
     idx_step2 = np.searchsorted(time, step2_time)
@@ -1791,8 +2299,14 @@ def plot_dual_response(time, y_data_dict, u_array,
 
     ax.axhline(y=y_band_low_2, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
     ax.axhline(y=y_band_high_2, color='#1a1a1a', linestyle=':', linewidth=1.2, alpha=0.6)
-    ax.fill_between(time_window_2, y_band_low_2, y_band_high_2, alpha=0.08,
-                    color='#1a1a1a', label=f'Step 2 Band (±{step2_threshold*100:.0f}%)')
+    ax.fill_between(
+        time_window_2,
+        y_band_low_2,
+        y_band_high_2,
+        alpha=0.08,
+        color='#1a1a1a',
+        label=f'Step 2 Band (±{step2_threshold * 100:.0f}%)',
+    )
 
     # === ANNOTATION BOXES ===
     # tR boxes at bottom, tS boxes at top; vlines cross full plot height.
@@ -1810,12 +2324,14 @@ def plot_dual_response(time, y_data_dict, u_array,
             if step1_name in step_dict:
                 si = step_dict[step1_name]
                 if not np.isnan(si.metrics.SettlingTime):
-                    boxes_step1_ts.append({
-                        'label': label,
-                        'time': step1_time + si.metrics.SettlingTime,
-                        'value': si.metrics.SettlingTime,
-                        'color': curve_colors.get(label, '#000000')
-                    })
+                    boxes_step1_ts.append(
+                        {
+                            'label': label,
+                            'time': step1_time + si.metrics.SettlingTime,
+                            'value': si.metrics.SettlingTime,
+                            'color': curve_colors.get(label, '#000000'),
+                        }
+                    )
 
     # Step 2 Rise Times
     if show_step2_tr and step_info_dict:
@@ -1823,27 +2339,26 @@ def plot_dual_response(time, y_data_dict, u_array,
             if step2_name in step_dict:
                 si = step_dict[step2_name]
                 if not np.isnan(si.metrics.RiseTime):
-                    
                     # Get specific curve data for this label
                     y_curve = np.asarray(y_data_dict[label])
-                    
+
                     # Get y_initial and y_final from the step_info object (if any), or use default Step 2
                     curve_y_init = si.y_initial if hasattr(si, 'y_initial') else y_initial_2
                     curve_y_fin = si.yfinal if hasattr(si, 'yfinal') else y_final_2
                     curve_delta = curve_y_fin - curve_y_init
-                    
+
                     # Find the absolute time when the curve reaches 90% of delta
                     if abs(curve_delta) > 1e-6:
                         idx_step = np.searchsorted(time, step2_time)
                         threshold_90 = curve_y_init + 0.9 * curve_delta
                         y_slice = y_curve[idx_step:]
-                        
+
                         # Check step direction (up or down)
                         if curve_delta > 0:
                             crossing = y_slice >= threshold_90
                         else:
                             crossing = y_slice <= threshold_90
-                            
+
                         crossing_indices = np.nonzero(crossing)[0]
                         if crossing_indices.size > 0:
                             rt_abs = time[idx_step + crossing_indices[0]]
@@ -1854,12 +2369,14 @@ def plot_dual_response(time, y_data_dict, u_array,
                         rt_abs = step2_time + si.metrics.RiseTime
 
                     # Add to the box list with the x (time) position already accurate at 90%
-                    boxes_step2_tr.append({
-                        'label': label,
-                        'time': rt_abs, 
-                        'value': si.metrics.RiseTime,
-                        'color': curve_colors.get(label, '#000000')
-                    })
+                    boxes_step2_tr.append(
+                        {
+                            'label': label,
+                            'time': rt_abs,
+                            'value': si.metrics.RiseTime,
+                            'color': curve_colors.get(label, '#000000'),
+                        }
+                    )
 
     # Step 2 Settling Times
     if show_step2_ts and step_info_dict:
@@ -1867,12 +2384,14 @@ def plot_dual_response(time, y_data_dict, u_array,
             if step2_name in step_dict:
                 si = step_dict[step2_name]
                 if not np.isnan(si.metrics.SettlingTime):
-                    boxes_step2_ts.append({
-                        'label': label,
-                        'time': step2_time + si.metrics.SettlingTime,
-                        'value': si.metrics.SettlingTime,
-                        'color': curve_colors.get(label, '#000000')
-                    })
+                    boxes_step2_ts.append(
+                        {
+                            'label': label,
+                            'time': step2_time + si.metrics.SettlingTime,
+                            'value': si.metrics.SettlingTime,
+                            'color': curve_colors.get(label, '#000000'),
+                        }
+                    )
 
     # === EXTEND Y-AXIS based on actual stagger levels needed ===
     x_lo, x_hi = ax.get_xlim()
@@ -1883,13 +2402,17 @@ def plot_dual_response(time, y_data_dict, u_array,
     n_levels_ts = _needed_levels(all_ts_boxes_combined, x_lo, x_hi)
 
     # Each slot: box_height (6.5% y_span) + margin (2%) = 8.5%
-    slot_frac   = 0.065 + 0.02
-    edge_frac   = 0.06  # margin_from_axis in _stack_boxes_smart
+    slot_frac = 0.065 + 0.02
+    edge_frac = 0.06  # margin_from_axis in _stack_boxes_smart
 
     if n_levels_tr > 0 or n_levels_ts > 0:
         y_span_data = y_max - y_min
-        space_bottom = (edge_frac + n_levels_tr * slot_frac + 0.065 / 2) * y_span_data + margin_from_plot
-        space_top    = (edge_frac + n_levels_ts * slot_frac + 0.065 / 2) * y_span_data + margin_from_plot
+        space_bottom = (
+            edge_frac + n_levels_tr * slot_frac + 0.065 / 2
+        ) * y_span_data + margin_from_plot
+        space_top = (
+            edge_frac + n_levels_ts * slot_frac + 0.065 / 2
+        ) * y_span_data + margin_from_plot
         ax.set_ylim(y_min - space_bottom, y_max + space_top)
 
     cur_y_min, cur_y_max = ax.get_ylim()
@@ -1900,29 +2423,85 @@ def plot_dual_response(time, y_data_dict, u_array,
 
     # === PLOT tR BOXES at BOTTOM (Step 2 only), staggered ===
     if boxes_step2_tr:
-        positioned = _stack_boxes_smart(boxes_step2_tr, cur_y_min, cur_y_max, cur_y_span,
-                                        position_type='bottom', x_min=x_lo, x_max=x_hi)
+        positioned = _stack_boxes_smart(
+            boxes_step2_tr,
+            cur_y_min,
+            cur_y_max,
+            cur_y_span,
+            position_type='bottom',
+            x_min=x_lo,
+            x_max=x_hi,
+        )
         for i, box in enumerate(positioned):
-            ax.vlines(x=box['time'], ymin=cur_y_min, ymax=cur_y_max, colors=box['color'], linestyles='--', linewidth=1.0, alpha=0.5, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(tr_box_y, i, box['y_center']),
-                   s=f"$t_R$ = {box['value']:.0f} s\n({box['label']})",
-                   color=box['color'], fontsize=9, fontweight='bold',
-                   ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                            edgecolor=box['color'], alpha=1.0, linewidth=1.5))
+            ax.vlines(
+                x=box['time'],
+                ymin=cur_y_min,
+                ymax=cur_y_max,
+                colors=box['color'],
+                linestyles='--',
+                linewidth=1.0,
+                alpha=0.5,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(tr_box_y, i, box['y_center']),
+                s=f'$t_R$ = {box["value"]:.0f} s\n({box["label"]})',
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.4',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # === PLOT tS BOXES at TOP (Step 1 + Step 2), staggered ===
     if all_ts_boxes_combined:
-        positioned = _stack_boxes_smart(all_ts_boxes_combined, cur_y_min, cur_y_max, cur_y_span,
-                                        position_type='top', x_min=x_lo, x_max=x_hi)
+        positioned = _stack_boxes_smart(
+            all_ts_boxes_combined,
+            cur_y_min,
+            cur_y_max,
+            cur_y_span,
+            position_type='top',
+            x_min=x_lo,
+            x_max=x_hi,
+        )
         for i, box in enumerate(positioned):
-            ax.vlines(x=box['time'], ymin=cur_y_min, ymax=cur_y_max, colors=box['color'], linestyles=':', linewidth=1.0, alpha=0.5, zorder=2)
-            ax.text(x=box['time'], y=_resolve_box_y(ts_box_y, i, box['y_center']),
-                   s=f"$t_S$ = {box['value']:.0f} s\n({box['label']})",
-                   color=box['color'], fontsize=9, fontweight='bold',
-                   ha='center', va='center', zorder=3,
-                   bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
-                            edgecolor=box['color'], alpha=1.0, linewidth=1.5))
+            ax.vlines(
+                x=box['time'],
+                ymin=cur_y_min,
+                ymax=cur_y_max,
+                colors=box['color'],
+                linestyles=':',
+                linewidth=1.0,
+                alpha=0.5,
+                zorder=2,
+            )
+            ax.text(
+                x=box['time'],
+                y=_resolve_box_y(ts_box_y, i, box['y_center']),
+                s=f'$t_S$ = {box["value"]:.0f} s\n({box["label"]})',
+                color=box['color'],
+                fontsize=9,
+                fontweight='bold',
+                ha='center',
+                va='center',
+                zorder=3,
+                bbox={
+                    'boxstyle': 'round,pad=0.4',
+                    'facecolor': 'white',
+                    'edgecolor': box['color'],
+                    'alpha': 1.0,
+                    'linewidth': 1.5,
+                },
+            )
 
     # Formatting
     ax.set_xlabel('Time (s)', fontsize=12, fontweight='bold', labelpad=8)
@@ -1932,9 +2511,16 @@ def plot_dual_response(time, y_data_dict, u_array,
     #     ax.set_title(title, fontsize=13, fontweight='bold')
 
     # Legend below the x-axis
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09),
-              ncol=6, fontsize=10, frameon=True, framealpha=0.95,
-              edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=6,
+        fontsize=10,
+        frameon=True,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
     ax.grid(True, alpha=0.3)
     ax.spines['top'].set_visible(True)
     ax.spines['right'].set_visible(True)
@@ -1949,16 +2535,29 @@ def plot_dual_response(time, y_data_dict, u_array,
 
     if savefig_path is not None:
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, ax
 
 
-def plot_simple_response(time, y, u=None, title=None, ylabel=None, xlabel='Time (s)',
-                         y_label_unit=None, figsize=(14, 7),
-                         curve_color='#0055cc', input_color='#d65a00',
-                         legend_loc='upper center', grid_alpha=0.3,
-                         tight_layout=True, dpi=None, savefig_path=None, ylim=None):
+def plot_simple_response(
+    time,
+    y,
+    u=None,
+    title=None,
+    ylabel=None,
+    xlabel='Time (s)',
+    y_label_unit=None,
+    figsize=(14, 7),
+    curve_color='#0055cc',
+    input_color='#d65a00',
+    legend_loc='upper center',
+    grid_alpha=0.3,
+    tight_layout=True,
+    dpi=None,
+    savefig_path=None,
+    ylim=None,
+):
     """Create simple plot of process variable and optional input (no metrics/boxes).
 
     Uses publication-quality styling matching other plot functions.
@@ -2017,12 +2616,13 @@ def plot_simple_response(time, y, u=None, title=None, ylabel=None, xlabel='Time 
         # Handle scalar input
         if u.ndim == 0:
             u = np.full_like(time, float(u))
-        ax.plot(time, u, label='Setpoint (SP)', linestyle='--',
-                color=input_color, linewidth=1.5)
+        ax.plot(time, u, label='Setpoint (SP)', linestyle='--', color=input_color, linewidth=1.5)
 
     # Labels and formatting
     if ylabel:
-        ax.set_ylabel(f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(
+            f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold'
+        )
 
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold', labelpad=8)
 
@@ -2030,9 +2630,16 @@ def plot_simple_response(time, y, u=None, title=None, ylabel=None, xlabel='Time 
     #     ax.set_title(title, fontsize=13, fontweight='bold')
 
     # Legend
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09),
-              ncol=6, fontsize=10, frameon=True, framealpha=0.95,
-              edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=6,
+        fontsize=10,
+        frameon=True,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
     ax.grid(True, alpha=grid_alpha)
 
     # Publication-quality formatting (match plot_step_response_multiple style)
@@ -2054,16 +2661,29 @@ def plot_simple_response(time, y, u=None, title=None, ylabel=None, xlabel='Time 
         if dpi is None:
             dpi = 600
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, ax
 
 
-def plot_simple_response_multiple(time, y_data_dict, u=None, title=None, ylabel=None,
-                                  xlabel='Time (s)', y_label_unit=None, figsize=(14, 7),
-                                  curve_colors=None, input_color='#d65a00',
-                                  legend_loc='upper center', grid_alpha=0.3,
-                                  tight_layout=True, dpi=None, savefig_path=None, ylim=None):
+def plot_simple_response_multiple(
+    time,
+    y_data_dict,
+    u=None,
+    title=None,
+    ylabel=None,
+    xlabel='Time (s)',
+    y_label_unit=None,
+    figsize=(14, 7),
+    curve_colors=None,
+    input_color='#d65a00',
+    legend_loc='upper center',
+    grid_alpha=0.3,
+    tight_layout=True,
+    dpi=None,
+    savefig_path=None,
+    ylim=None,
+):
     """Create simple plot of multiple process variables and optional input (no metrics/boxes).
 
     Uses publication-quality styling matching other plot functions.
@@ -2125,13 +2745,16 @@ def plot_simple_response_multiple(time, y_data_dict, u=None, title=None, ylabel=
     # Setup colors
     default_colors = ['#0055cc', '#d65a00', '#008000', '#cc0000', '#9400d3', '#ff8c00']
     if curve_colors is None:
-        colors_dict = {label: default_colors[i % len(default_colors)]
-                      for i, label in enumerate(y_data_dict.keys())}
+        colors_dict = {
+            label: default_colors[i % len(default_colors)]
+            for i, label in enumerate(y_data_dict.keys())
+        }
     elif isinstance(curve_colors, dict):
         colors_dict = curve_colors
     else:
-        colors_dict = {label: curve_colors[i % len(curve_colors)]
-                      for i, label in enumerate(y_data_dict.keys())}
+        colors_dict = {
+            label: curve_colors[i % len(curve_colors)] for i, label in enumerate(y_data_dict.keys())
+        }
 
     # Create figure
     fig, ax = plt.subplots(figsize=figsize)
@@ -2148,12 +2771,13 @@ def plot_simple_response_multiple(time, y_data_dict, u=None, title=None, ylabel=
         # Handle scalar input
         if u.ndim == 0:
             u = np.full_like(time, float(u))
-        ax.plot(time, u, label='Setpoint', linestyle='--',
-                color=input_color, linewidth=1.5)
+        ax.plot(time, u, label='Setpoint', linestyle='--', color=input_color, linewidth=1.5)
 
     # Labels and formatting
     if ylabel:
-        ax.set_ylabel(f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(
+            f'{ylabel} ({y_label_unit})' if y_label_unit else ylabel, fontsize=12, fontweight='bold'
+        )
 
     ax.set_xlabel(xlabel, fontsize=12, fontweight='bold', labelpad=8)
 
@@ -2161,9 +2785,16 @@ def plot_simple_response_multiple(time, y_data_dict, u=None, title=None, ylabel=
     #     ax.set_title(title, fontsize=13, fontweight='bold')
 
     # Legend
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.09),
-              ncol=6, fontsize=10, frameon=True, framealpha=0.95,
-              edgecolor='gray', fancybox=True)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, -0.09),
+        ncol=6,
+        fontsize=10,
+        frameon=True,
+        framealpha=0.95,
+        edgecolor='gray',
+        fancybox=True,
+    )
     ax.grid(True, alpha=grid_alpha)
 
     # Publication-quality formatting (match plot_step_response_multiple style)
@@ -2185,7 +2816,7 @@ def plot_simple_response_multiple(time, y_data_dict, u=None, title=None, ylabel=
         if dpi is None:
             dpi = 600
         _save_fig(fig, savefig_path, dpi)
-        print(f"[OK] Figure saved to: {savefig_path} (DPI={dpi})")
+        print(f'[OK] Figure saved to: {savefig_path} (DPI={dpi})')
 
     return fig, ax
 
@@ -2238,4 +2869,4 @@ def setup_publication_style(font_family='serif', font_size=11, font_serif=None):
     plt.rcParams['figure.dpi'] = 150
     plt.rcParams['savefig.dpi'] = 600
 
-    print("Publication style configured")
+    print('Publication style configured')
