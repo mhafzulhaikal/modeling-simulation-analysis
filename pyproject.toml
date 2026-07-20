@@ -66,6 +66,7 @@ exclude = [
     "**/.*",
     "**/*.svg",
     "**/*.csv",
+    "**/.ruff_cache",
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false
