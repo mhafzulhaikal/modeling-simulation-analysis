@@ -19,6 +19,7 @@ DPI reference: effective_dpi = 96 × SCALE
 import logging
 
 from model.mermaid_diagram import save_diagram
+from model.mermaid_renderer import add_svg_border
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s  %(message)s')
 
@@ -91,4 +92,9 @@ if __name__ == '__main__':
         height=HEIGHT,
         mermaid_config=MERMAID_CONFIG,
     )
+
+    # Optionally add a border if it's an SVG
+    if path.suffix.lower() == '.svg':
+        add_svg_border(path, color='#cccccc', width=2.0)
+
     print(f'Saved -> {path}')

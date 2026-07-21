@@ -334,3 +334,60 @@ def embed_fonts_svg(svg_path: str | Path, output: str | Path | None = None) -> P
     output.write_text(content, encoding='utf-8')
     logger.info('embed_fonts_svg: saved %s  (%.1f kB)', output, output.stat().st_size / 1024)
     return output
+
+
+def add_svg_border(
+    svg_path: str | Path,
+    color: str = '#e5e5e5',
+    width: float = 2.0,
+    radius: float = 8.0,
+) -> Path:
+    """Draw a bounding box (outline) around the entire SVG diagram.
+
+    This injects a `<rect>` element tightly fitted to the SVG's `viewBox`
+    so the border is never cut off, even when scaled.
+
+    Parameters
+    ----------
+    svg_path:
+        Path to the source ``.svg`` file.
+    color:
+        Border stroke color (CSS string).
+    width:
+        Border line thickness.
+    radius:
+        Border corner roundness (rx/ry).
+
+    Returns
+    -------
+    Path
+        The path to the modified SVG file.
+    """
+    path = Path(svg_path)
+    content = path.read_text(encoding='utf-8')
+
+    # Find the SVG viewBox to fit the border perfectly
+    m = re.search(r'viewBox="([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)"', content)
+    if not m:
+        logger.warning('add_svg_border: no viewBox found in %s', path.name)
+        return path
+
+    x, y, w, h = map(float, m.groups())
+
+    # Inset by half stroke-width so the border doesn't clip outside viewBox
+    rx = x + width / 2
+    ry = y + width / 2
+    rw = w - width
+    rh = h - width
+
+    rect = (
+        f'<rect x="{rx}" y="{ry}" width="{rw}" height="{rh}" '
+        f'fill="none" stroke="{color}" stroke-width="{width}" rx="{radius}"/>'
+    )
+
+    # Inject the rect right after the opening <svg> tag
+    content = re.sub(r'(<svg[^>]*>)', r'\1\n' + rect, content, count=1)
+    path.write_text(content, encoding='utf-8')
+
+    logger.info('add_svg_border: added %s border to %s', color, path.name)
+    return path
