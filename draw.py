@@ -12,9 +12,9 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s  %(message)s')
 GLOBAL_CONFIG = """---
 config:
   theme: redux
-  fontFamily: '''Source Code Pro Variable'', monospace'
+  fontFamily: 'Helvetica, sans-serif'
   themeVariables:
-    fontSize: '16pt'
+    fontSize: '14pt'
     primaryColor: '#ffffff'
     primaryTextColor: 'black'
     lineColor: 'black'
@@ -33,30 +33,60 @@ config:
 # Define multiple diagrams as a dictionary: { "filename": "mermaid_code" }
 DIAGRAMS = {
     'gambar_3-1.png': """flowchart TB
-    S([Mulai]) --> A["`**Fase A**: Pemodelan dan Analisis Sistem`"]
-    A --> V1{Model terverifikasi?}
+    S([Mulai]) --> A["`**Fase A**: Pemodelan dan analisis sistem`"]
+    A --> V1{Kondisi tunak konsisten?}
     V1 -->|Tidak| A
-    V1 -->|Ya| B["`**Fase B**: Perancangan dan Implementasi Sistem Kendali`"]
-    B --> C["`**Fase C**: Simulasi dan Validasi`"]
+    V1 -->|Ya| B["`**Fase B**: Perancangan dan implementasi sistem kendali`"]
+    B --> C["`**Fase C**: Simulasi dan validasi`"]
     C --> V2{Respons tervalidasi?}
     V2 -->|Tidak| B
-    V2 -->|Ya| D["`**Fase D**: Pengembangan Aplikasi Web`"]
+    V2 -->|Ya| D["`**Fase D**: Pengembangan aplikasi web`"]
     D --> E([Selesai])
 """,
     'gambar_3-2.png': """flowchart TB
-    A[Penetapan volume kendali] --> B[Penyusunan neraca massa total]
-    B --> C[Penyusunan neraca mol tiap komponen]
-    C --> D[Penyusunan neraca energi reaktor dan pendingin]
-    D --> E[Sistem ODE non-linear]
-    E --> F{"Konsistensi dimensi/satuan dan derajat kebebasan terpenuhi?"}
-    F -->|Tidak| E
-    F -->|Ya| G[Penulisan skrip model proses Python]
+    S([Mulai]) --> A[Studi literatur dan penentuan studi kasus]
+    A --> B[Penurunan neraca keadaan tak tunak dan tunak]
+    B --> C[Penyusunan skrip Python model proses]
+    C --> D[Penyelesaian kondisi tunak untuk titik operasi]
+    D --> E[Linearisasi model dan penurunan fungsi alih]
+    E --> F[Verifikasi konsistensi kondisi tunak]
+    F --> G{Kondisi tunak konsisten?}
+    G -->|Tidak| B
+    G -->|Ya| H(["`Lanjut ke **Fase B**`"])
 """,
     'gambar_3-3.png': """flowchart TB
-    A[Perumusan model] --> B[Pemeriksaan neraca massa, mol, energi pada kondisi tunak]
-    B --> C{Residu di bawah toleransi?}
-    C -->|Tidak| B
-    C -->|Ya| D[Model terverifikasi]
+    S(["`Dari **Fase A**`"]) --> A[Pemodelan elemen penyusun loop kendali]
+    A --> B[Perangkaian elemen proses secara open-loop]
+    B --> C[Pengujian step test]
+    C --> D[/Data respons step test/]
+    D --> E[Identifikasi model FOPDT]
+    E --> F{Model FOPDT layak?}
+    F -->|Tidak| C
+    F -->|Ya| G[Pengaturan parameter pengendali]
+    G --> H(["`Lanjut ke **Fase C**`"])
+""",
+    'gambar_3-4.png': """flowchart TB
+    S(["`Dari **Fase B**`"]) --> A[Pemodelan Aspen HYSYS Dynamic]
+    A --> B[Validasi fungsi tiap elemen kendali]
+    B --> C[Perangkaian sistem closed-loop]
+    C --> D[Simulasi skenario servo dan regulatory]
+    D --> E[Analisis kinerja sistem kendali]
+    E --> F[Validasi respons Python terhadap Aspen HYSYS Dynamic]
+    F --> G{Respons tervalidasi?}
+    G -->|Tidak| H(["`Kembali ke **Fase B**`"])
+    G -->|Ya| I(["`Lanjut ke **Fase D**`"])
+""",
+    'gambar_3-5.png': """flowchart TB
+    S(["`Dari **Fase C**`"]) --> A[Perancangan antarmuka pengguna]
+    S --> B[Pengembangan mesin simulasi]
+    A --> C[Integrasi aplikasi web NiceGUI]
+    B --> C
+    C --> D[Uji fungsional dan validasi keluaran]
+    D --> E{Aplikasi diterima?}
+    E -->|Tidak| C
+    E -->|Ya| F[Deployment aplikasi]
+    F --> G[Publikasi repositori open source]
+    G --> H([Selesai])
 """,
 }
 
