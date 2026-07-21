@@ -50,7 +50,7 @@ flowchart TB
     end
 
     %% Gaya bingkai (outline) menggunakan style subgraph
-    style outline fill:none,stroke:#cccccc,stroke-width:2px,rx:8px,ry:8px
+    style outline fill:none,stroke:#000000,stroke-width:1px
 """
 
 # ─────────────────────────────────────────────────────────────────────────────
