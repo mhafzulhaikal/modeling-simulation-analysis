@@ -13,7 +13,6 @@ Supported output formats (controlled by file extension in OUTPUT):
 DPI reference: effective_dpi = 96 × SCALE
     scale=13  -> 1248 dpi  ✓ (>= 1200 dpi)
     scale=10  ->  960 dpi
-    scale=5   ->  480 dpi
 """
 
 import logging
@@ -27,36 +26,48 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s  %(message)s')
 # ─────────────────────────────────────────────────────────────────────────────
 
 DIAGRAM = """
-flowchart LR
-    SP([Setpoint r&#40;t&#41;])  --> SUM((+/-))
-    SUM --> PID[[PID Controller]]
-    PID --> PLANT[Plant G&#40;s&#41;]
-    PLANT --> Y([Output y&#40;t&#41;])
-    Y --> SENS[Sensor H&#40;s&#41;]
-    SENS -->|feedback| SUM
+---
+config:
+  theme: redux
+  layout: elk
+  look: classic
+  fontFamily: '''Source Code Pro Variable'', monospace'
+  htmlLabels: False
+  themeCSS: '.edgeLabel rect { opacity: 1.0 !important; fill: #e5e5e5 !important; }'
+---
+flowchart TB
+    subgraph outline[" "]
+        direction TB
+        S([Mulai]) --> A[Fase A: Pemodelan dan Analisis Sistem]
+        A --> V1{Model terverifikasi?}
+        V1 -->|Tidak| A
+        V1 -->|Ya| B[Fase B: Perancangan dan Implementasi Sistem Kendali]
+        B --> C[Fase C: Simulasi dan Validasi]
+        C --> V2{Respons tervalidasi?}
+        V2 -->|Tidak| B
+        V2 -->|Ya| D[Fase D: Pengembangan Aplikasi Web]
+        D --> E([Selesai])
+    end
+
+    %% Gaya bingkai (outline) menggunakan style subgraph
+    style outline fill:none,stroke:#cccccc,stroke-width:2px,rx:8px,ry:8px
 """
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. OUTPUT  – file path + extension sets the format
 # ─────────────────────────────────────────────────────────────────────────────
 
-OUTPUT = 'outputs/diagrams/pid_loop.svg'  # .svg | .png | .pdf
+OUTPUT = 'outputs/diagrams/metodologi.svg'  # .svg | .png | .pdf
 SCALE = 13  # PNG/PDF only: 96 × 13 = 1248 dpi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. RENDER OPTIONS  (optional)
 # ─────────────────────────────────────────────────────────────────────────────
 
-THEME = 'default'  # 'default' | 'forest' | 'dark' | 'neutral'
-BACKGROUND = 'white'  # any CSS colour, or 'transparent'
-WIDTH = 1200  # viewport width  (px)
-HEIGHT = 600  # viewport height (px)
-
-# Extra Mermaid config — see https://mermaid.js.org/config/schema-docs/config.html
-# Leave as None to use Mermaid defaults.
-MERMAID_CONFIG: dict | None = None
-# Example:
-# MERMAID_CONFIG = {'flowchart': {'curve': 'basis'}, 'fontSize': 16}
+THEME = 'default'
+BACKGROUND = 'white'
+WIDTH = 1200
+HEIGHT = 600
 
 # ─────────────────────────────────────────────────────────────────────────────
 # EXECUTE
@@ -71,6 +82,5 @@ if __name__ == '__main__':
         background=BACKGROUND,
         width=WIDTH,
         height=HEIGHT,
-        mermaid_config=MERMAID_CONFIG,
     )
     print(f'Saved -> {path}')

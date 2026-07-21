@@ -13,6 +13,7 @@ from .mermaid_diagram import (
     State,
     save_diagram,
 )
+from .mermaid_renderer import embed_fonts_svg
 from .mermaid_renderer import render as render_mermaid
 from .plant import BiodieselPlant, DynamicPlant
 from .plant import BiodieselPlant as BiodieselReactorSystem

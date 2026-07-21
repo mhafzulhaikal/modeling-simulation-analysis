@@ -3,8 +3,8 @@ mermaid_diagram.py
 ------------------
 Lightweight Mermaid diagram builders.
 
-Each class assembles valid Mermaid source text through a fluent API and
-delegates rendering to :func:`model.mermaid_renderer.render`.
+Each class assembles valid Mermaid source through a fluent API and delegates
+rendering to :func:`model.mermaid_renderer.render`.
 
 Supported diagram types
 -----------------------
@@ -18,30 +18,20 @@ Supported diagram types
 from __future__ import annotations
 
 import textwrap
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 from model.mermaid_renderer import DEFAULT_SCALE, render
 
-__all__ = [
-    'Flowchart',
-    'Sequence',
-    'Class',
-    'State',
-    'Gantt',
-    'save_diagram',
-]
-
-# ---------------------------------------------------------------------------
-# Base
-# ---------------------------------------------------------------------------
+__all__ = ['Flowchart', 'Sequence', 'Class', 'State', 'Gantt', 'save_diagram']
 
 
-class _Diagram:
+class _Diagram(ABC):
     """Shared rendering interface for all diagram types."""
 
+    @abstractmethod
     def source(self) -> str:
         """Return the complete Mermaid source string."""
-        raise NotImplementedError
 
     def save(
         self,
@@ -64,18 +54,16 @@ class _Diagram:
         output:
             Destination path, e.g. ``'outputs/diagrams/my_diagram.svg'``.
         scale:
-            Puppeteer scale factor for PNG/PDF.  Effective DPI = 96 × scale.
-            Default 13 -> 1248 dpi.  Ignored for SVG (which is lossless).
+            PNG/PDF Puppeteer scale factor.  Effective DPI = 96 × scale.
+            Default 13 → 1248 dpi.  Ignored for SVG.
         theme:
             ``'default'``, ``'forest'``, ``'dark'``, or ``'neutral'``.
         background:
-            Background colour (e.g. ``'white'``, ``'transparent'``,
-            ``'#F5F5F5'``).
+            CSS colour string, e.g. ``'white'``, ``'transparent'``.
         width / height:
             Puppeteer viewport dimensions (pixels).
         mermaid_config:
-            Extra Mermaid config dict, e.g.
-            ``{'flowchart': {'curve': 'basis'}, 'fontSize': 16}``.
+            Extra Mermaid config dict, e.g. ``{'htmlLabels': False}``.
 
         Returns
         -------
@@ -94,11 +82,6 @@ class _Diagram:
         )
 
 
-# ---------------------------------------------------------------------------
-# Flowchart
-# ---------------------------------------------------------------------------
-
-
 class Flowchart(_Diagram):
     """Mermaid flowchart builder.
 
@@ -113,15 +96,10 @@ class Flowchart(_Diagram):
     Examples
     --------
     >>> d = Flowchart('LR', title='PID Loop')
-    >>> d.node('SP', 'Setpoint')
-    >>> d.node('PID', 'Controller', shape='subroutine')
-    >>> d.node('P', 'Plant')
-    >>> d.edge('SP', 'PID', 'r(t)')
-    >>> d.edge('PID', 'P', 'u(t)')
-    >>> d.save('outputs/diagrams/pid.svg')
+    >>> d.node('SP', 'Setpoint').node('PID', 'Controller', shape='subroutine')
+    >>> d.edge('SP', 'PID', 'r(t)').save('outputs/diagrams/pid.svg')
     """
 
-    # Mermaid shape brackets
     _SHAPES: dict[str, tuple[str, str]] = {
         'rect': ('[', ']'),
         'round': ('(', ')'),
@@ -140,11 +118,7 @@ class Flowchart(_Diagram):
         self._lines: list[str] = []
 
     def node(
-        self,
-        id: str,
-        label: str | None = None,
-        shape: str = 'rect',
-        cls: str | None = None,
+        self, id: str, label: str | None = None, shape: str = 'rect', cls: str | None = None
     ) -> Flowchart:
         """Add a node."""
         lbl = label if label is not None else id
@@ -155,13 +129,7 @@ class Flowchart(_Diagram):
         self._lines.append(line)
         return self
 
-    def edge(
-        self,
-        src: str,
-        dst: str,
-        label: str = '',
-        arrow: str = '-->',
-    ) -> Flowchart:
+    def edge(self, src: str, dst: str, label: str = '', arrow: str = '-->') -> Flowchart:
         """Add a directed edge."""
         mid = f'|"{label}"| ' if label else ' '
         self._lines.append(f'    {src} {arrow}{mid}{dst}')
@@ -179,10 +147,11 @@ class Flowchart(_Diagram):
 
     def subgraph(self, id: str, label: str, node_ids: list[str]) -> Flowchart:
         """Group nodes in a labelled subgraph box."""
-        self._lines.append(f'    subgraph {id}["{label}"]')
-        for nid in node_ids:
-            self._lines.append(f'        {nid}')
-        self._lines.append('    end')
+        self._lines += [
+            f'    subgraph {id}["{label}"]',
+            *(f'        {n}' for n in node_ids),
+            '    end',
+        ]
         return self
 
     def raw(self, line: str) -> Flowchart:
@@ -191,17 +160,8 @@ class Flowchart(_Diagram):
         return self
 
     def source(self) -> str:
-        parts: list[str] = []
-        if self.title:
-            parts += ['---', f'title: {self.title}', '---']
-        parts.append(f'flowchart {self.direction}')
-        parts.extend(self._lines)
-        return '\n'.join(parts)
-
-
-# ---------------------------------------------------------------------------
-# Sequence
-# ---------------------------------------------------------------------------
+        header = ['---', f'title: {self.title}', '---'] if self.title else []
+        return '\n'.join([*header, f'flowchart {self.direction}', *self._lines])
 
 
 class Sequence(_Diagram):
@@ -210,11 +170,8 @@ class Sequence(_Diagram):
     Examples
     --------
     >>> d = Sequence(title='Control Handshake', autonumber=True)
-    >>> d.participant('Sensor', 'S')
-    >>> d.participant('Controller', 'C')
-    >>> d.message('S', 'C', 'y(t)')
-    >>> d.message('C', 'S', 'u(t)')
-    >>> d.save('outputs/diagrams/handshake.png')
+    >>> d.participant('Sensor', 'S').participant('Controller', 'C')
+    >>> d.message('S', 'C', 'y(t)').save('outputs/diagrams/handshake.png')
     """
 
     def __init__(self, *, title: str = '', autonumber: bool = False) -> None:
@@ -229,19 +186,13 @@ class Sequence(_Diagram):
         self._lines.append(f'    {kind} {name}{alias_part}')
         return self
 
-    def message(
-        self,
-        src: str,
-        dst: str,
-        text: str,
-        arrow: str = '->>',
-    ) -> Sequence:
+    def message(self, src: str, dst: str, text: str, arrow: str = '->>') -> Sequence:
         """Add a message arrow."""
         self._lines.append(f'    {src}{arrow}{dst}: {text}')
         return self
 
     def note(self, pos: str, participant: str, text: str) -> Sequence:
-        """Add a note (pos: 'left of', 'right of', 'over')."""
+        """Add a note (pos: ``'left of'``, ``'right of'``, ``'over'``)."""
         self._lines.append(f'    Note {pos} {participant}: {text}')
         return self
 
@@ -251,19 +202,9 @@ class Sequence(_Diagram):
         return self
 
     def source(self) -> str:
-        parts: list[str] = []
-        if self.title:
-            parts += ['---', f'title: {self.title}', '---']
-        parts.append('sequenceDiagram')
-        if self.autonumber:
-            parts.append('    autonumber')
-        parts.extend(self._lines)
-        return '\n'.join(parts)
-
-
-# ---------------------------------------------------------------------------
-# Class diagram
-# ---------------------------------------------------------------------------
+        header = ['---', f'title: {self.title}', '---'] if self.title else []
+        autonumber = ['    autonumber'] if self.autonumber else []
+        return '\n'.join([*header, 'sequenceDiagram', *autonumber, *self._lines])
 
 
 class Class(_Diagram):
@@ -272,10 +213,8 @@ class Class(_Diagram):
     Examples
     --------
     >>> d = Class(title='Control Classes')
-    >>> d.cls('PID', attrs=['Kp: float', 'Ki: float'], methods=['compute(e)'])
-    >>> d.cls('Plant', attrs=['gain: float'], methods=['step(u)'])
-    >>> d.relation('PID', 'Plant', '-->', 'controls')
-    >>> d.save('outputs/diagrams/classes.svg')
+    >>> d.cls('PID', attrs=['Kp: float'], methods=['compute(e)'])
+    >>> d.relation('PID', 'Plant', '-->', 'controls').save('outputs/diagrams/classes.svg')
     """
 
     def __init__(self, *, title: str = '') -> None:
@@ -283,27 +222,18 @@ class Class(_Diagram):
         self._lines: list[str] = []
 
     def cls(
-        self,
-        name: str,
-        attrs: list[str] | None = None,
-        methods: list[str] | None = None,
+        self, name: str, attrs: list[str] | None = None, methods: list[str] | None = None
     ) -> Class:
         """Add a class definition."""
-        self._lines.append(f'    class {name} {{')
-        for a in attrs or []:
-            self._lines.append(f'        +{a}')
-        for m in methods or []:
-            self._lines.append(f'        +{m}')
-        self._lines.append('    }')
+        self._lines += [
+            f'    class {name} {{',
+            *(f'        +{a}' for a in (attrs or [])),
+            *(f'        +{m}' for m in (methods or [])),
+            '    }',
+        ]
         return self
 
-    def relation(
-        self,
-        src: str,
-        dst: str,
-        arrow: str = '-->',
-        label: str = '',
-    ) -> Class:
+    def relation(self, src: str, dst: str, arrow: str = '-->', label: str = '') -> Class:
         """Add a relationship line."""
         lbl = f' : {label}' if label else ''
         self._lines.append(f'    {src} {arrow} {dst}{lbl}')
@@ -314,17 +244,8 @@ class Class(_Diagram):
         return self
 
     def source(self) -> str:
-        parts: list[str] = []
-        if self.title:
-            parts += ['---', f'title: {self.title}', '---']
-        parts.append('classDiagram')
-        parts.extend(self._lines)
-        return '\n'.join(parts)
-
-
-# ---------------------------------------------------------------------------
-# State diagram
-# ---------------------------------------------------------------------------
+        header = ['---', f'title: {self.title}', '---'] if self.title else []
+        return '\n'.join([*header, 'classDiagram', *self._lines])
 
 
 class State(_Diagram):
@@ -333,10 +254,8 @@ class State(_Diagram):
     Examples
     --------
     >>> d = State(title='PID States')
-    >>> d.state('Idle')
-    >>> d.state('Running')
-    >>> d.transition('[*]', 'Idle')
-    >>> d.transition('Idle', 'Running', 'SP changed')
+    >>> d.state('Idle').state('Running')
+    >>> d.transition('[*]', 'Idle').transition('Idle', 'Running', 'SP changed')
     >>> d.save('outputs/diagrams/states.svg')
     """
 
@@ -346,10 +265,8 @@ class State(_Diagram):
 
     def state(self, id: str, label: str = '') -> State:
         """Declare a state."""
-        if label:
-            self._lines.append(f'    state "{label}" as {id}')
-        else:
-            self._lines.append(f'    {id}')
+        line = f'    state "{label}" as {id}' if label else f'    {id}'
+        self._lines.append(line)
         return self
 
     def transition(self, src: str, dst: str, label: str = '') -> State:
@@ -363,17 +280,8 @@ class State(_Diagram):
         return self
 
     def source(self) -> str:
-        parts: list[str] = []
-        if self.title:
-            parts += ['---', f'title: {self.title}', '---']
-        parts.append('stateDiagram-v2')
-        parts.extend(self._lines)
-        return '\n'.join(parts)
-
-
-# ---------------------------------------------------------------------------
-# Gantt
-# ---------------------------------------------------------------------------
+        header = ['---', f'title: {self.title}', '---'] if self.title else []
+        return '\n'.join([*header, 'stateDiagram-v2', *self._lines])
 
 
 class Gantt(_Diagram):
@@ -383,17 +291,13 @@ class Gantt(_Diagram):
     --------
     >>> d = Gantt('Project Plan', date_format='YYYY-MM-DD')
     >>> d.section('Phase 1')
-    >>> d.task('Model FOPDT',   '2025-01-01', '7d')
-    >>> d.task('Fit params',    '2025-01-08', '5d', status='done')
+    >>> d.task('Model FOPDT', '2025-01-01', '7d')
+    >>> d.task('Fit params',  '2025-01-08', '5d', status='done')
     >>> d.save('outputs/diagrams/plan.svg')
     """
 
     def __init__(
-        self,
-        title: str = '',
-        *,
-        date_format: str = 'YYYY-MM-DD',
-        axis_format: str = '%b %d',
+        self, title: str = '', *, date_format: str = 'YYYY-MM-DD', axis_format: str = '%b %d'
     ) -> None:
         self.title = title
         self.date_format = date_format
@@ -406,13 +310,7 @@ class Gantt(_Diagram):
         return self
 
     def task(
-        self,
-        name: str,
-        start: str,
-        duration: str,
-        *,
-        id: str = '',
-        status: str = '',
+        self, name: str, start: str, duration: str, *, id: str = '', status: str = ''
     ) -> Gantt:
         """Add a task to the current section."""
         meta = ', '.join(filter(None, [status, id]))
@@ -425,20 +323,15 @@ class Gantt(_Diagram):
         return self
 
     def source(self) -> str:
-        lines = ['gantt']
-        if self.title:
-            lines.append(f'    title {self.title}')
-        lines += [
-            f'    dateFormat  {self.date_format}',
-            f'    axisFormat  {self.axis_format}',
-        ]
-        lines.extend(self._lines)
-        return '\n'.join(lines)
-
-
-# ---------------------------------------------------------------------------
-# Raw-source convenience function
-# ---------------------------------------------------------------------------
+        return '\n'.join(
+            [
+                'gantt',
+                *([f'    title {self.title}'] if self.title else []),
+                f'    dateFormat  {self.date_format}',
+                f'    axisFormat  {self.axis_format}',
+                *self._lines,
+            ]
+        )
 
 
 def save_diagram(
@@ -454,17 +347,17 @@ def save_diagram(
 ) -> Path:
     """Render raw Mermaid *source* text directly to *output*.
 
-    A thin wrapper for when you already have the Mermaid source string and
-    just want to save it — no builder class needed.
+    A thin wrapper around :func:`~model.mermaid_renderer.render` for when you
+    already have the Mermaid source string and don't need a builder class.
 
     Parameters
     ----------
     source:
-        Complete Mermaid diagram text.
+        Complete Mermaid diagram text (leading indentation is stripped).
     output:
-        Destination path (extension sets format: ``.svg``, ``.png``, ``.pdf``).
+        Destination path — extension sets format: ``.svg``, ``.png``, ``.pdf``.
     scale:
-        PNG/PDF scale factor.  Default 13 -> 1248 dpi.
+        PNG/PDF scale factor.  Default 13 → 1248 dpi.
     theme / background / width / height / mermaid_config:
         Forwarded to :func:`~model.mermaid_renderer.render`.
 
