@@ -52,6 +52,12 @@ DIAGRAMS = {
     F -->|Tidak| E
     F -->|Ya| G[Penulisan skrip model proses Python]
 """,
+    'gambar_3-3.png': """flowchart TB
+    A[Perumusan model] --> B[Pemeriksaan neraca massa, mol, energi pada kondisi tunak]
+    B --> C{Residu di bawah toleransi?}
+    C -->|Tidak| B
+    C -->|Ya| D[Model terverifikasi]
+""",
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
