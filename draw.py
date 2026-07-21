@@ -13,13 +13,11 @@ Supported output formats (controlled by file extension in OUTPUT):
 DPI reference: effective_dpi = 96 × SCALE
     scale=13  -> 1248 dpi  ✓ (>= 1200 dpi)
     scale=10  ->  960 dpi
-    scale=5   ->  480 dpi
 """
 
 import logging
 
 from model.mermaid_diagram import save_diagram
-from model.mermaid_renderer import add_svg_border
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s  %(message)s')
 
@@ -33,18 +31,26 @@ config:
   theme: redux
   layout: elk
   look: classic
-  fontFamily: "'Source Code Pro Variable', monospace"
+  fontFamily: '''Source Code Pro Variable'', monospace'
+  htmlLabels: False
+  themeCSS: '.edgeLabel rect { opacity: 1.0 !important; fill: #e5e5e5 !important; }'
 ---
 flowchart TB
-    S([Mulai]) --> A[Fase A: Pemodelan dan Analisis Sistem]
-    A --> V1{Model terverifikasi?}
-    V1 -->|Tidak| A
-    V1 -->|Ya| B[Fase B: Perancangan dan Implementasi Sistem Kendali]
-    B --> C[Fase C: Simulasi dan Validasi]
-    C --> V2{Respons tervalidasi?}
-    V2 -->|Tidak| B
-    V2 -->|Ya| D[Fase D: Pengembangan Aplikasi Web]
-    D --> E([Selesai])
+    subgraph outline[" "]
+        direction TB
+        S([Mulai]) --> A[Fase A: Pemodelan dan Analisis Sistem]
+        A --> V1{Model terverifikasi?}
+        V1 -->|Tidak| A
+        V1 -->|Ya| B[Fase B: Perancangan dan Implementasi Sistem Kendali]
+        B --> C[Fase C: Simulasi dan Validasi]
+        C --> V2{Respons tervalidasi?}
+        V2 -->|Tidak| B
+        V2 -->|Ya| D[Fase D: Pengembangan Aplikasi Web]
+        D --> E([Selesai])
+    end
+
+    %% Gaya bingkai (outline) menggunakan style subgraph
+    style outline fill:none,stroke:#cccccc,stroke-width:2px,rx:8px,ry:8px
 """
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -58,24 +64,10 @@ SCALE = 13  # PNG/PDF only: 96 × 13 = 1248 dpi
 # 3. RENDER OPTIONS  (optional)
 # ─────────────────────────────────────────────────────────────────────────────
 
-THEME = (
-    'default'  # 'default' | 'forest' | 'dark' | 'neutral'  (redux is set in diagram frontmatter)
-)
-BACKGROUND = 'white'  # any CSS colour, or 'transparent'
-WIDTH = 1200  # viewport width  (px)
-HEIGHT = 600  # viewport height (px)
-
-# Extra Mermaid config — see https://mermaid.js.org/config/schema-docs/config.html
-# htmlLabels: false  →  uses native SVG <text> instead of <foreignObject>,
-#                        which makes the SVG renderable in Microsoft Word.
-MERMAID_CONFIG: dict | None = {
-    'htmlLabels': False,
-    # In htmlLabels: false, edge labels have opacity: 0.5 and often use
-    # negative HSL values (e.g. hsl(-120, 0%, 80%)) which MS Word cannot parse,
-    # causing it to render as a solid black box.
-    # We override it to 1.0 opacity and a safe Hex color (#e5e5e5) to fix this.
-    'themeCSS': '.edgeLabel rect { opacity: 1.0 !important; fill: #e5e5e5 !important; }',
-}
+THEME = 'default'
+BACKGROUND = 'white'
+WIDTH = 1200
+HEIGHT = 600
 
 # ─────────────────────────────────────────────────────────────────────────────
 # EXECUTE
@@ -90,11 +82,5 @@ if __name__ == '__main__':
         background=BACKGROUND,
         width=WIDTH,
         height=HEIGHT,
-        mermaid_config=MERMAID_CONFIG,
     )
-
-    # Optionally add a border if it's an SVG
-    if path.suffix.lower() == '.svg':
-        add_svg_border(path, color='#cccccc', width=2.0)
-
     print(f'Saved -> {path}')
