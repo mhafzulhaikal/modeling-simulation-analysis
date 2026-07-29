@@ -95,7 +95,7 @@ DIAGRAMS = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 OUTPUT_DIR = 'outputs/diagrams/'
-SCALE = 13  # PNG/PDF only: 96 × 13 = 1248 dpi
+SCALE = 10  # PNG scale: 96 × 10 = 960 dpi (~1000 DPI high-resolution raster output)
 
 THEME = 'default'
 BACKGROUND = 'white'
@@ -110,18 +110,32 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     for filename, source in DIAGRAMS.items():
-        output_path = os.path.join(OUTPUT_DIR, filename)
-
         # Inject the global configuration at the top of each diagram!
         full_source = GLOBAL_CONFIG + source
 
-        path = save_diagram(
+        # 1. Save optimized high-res PNG (~300 DPI, safe from Word downsampling corruption)
+        png_path = os.path.join(OUTPUT_DIR, filename)
+        path_png = save_diagram(
             full_source,
-            output_path,
+            png_path,
             scale=SCALE,
             theme=THEME,
             background=BACKGROUND,
             width=WIDTH,
             height=HEIGHT,
         )
-        print(f'Saved -> {path}')
+        print(f'Saved PNG -> {path_png}')
+
+        # 2. Save lossless SVG with outline border (Vector format - recommended for MS Word native vector support & PDF export)
+        svg_filename = os.path.splitext(filename)[0] + '.svg'
+        svg_path = os.path.join(OUTPUT_DIR, svg_filename)
+        path_svg = save_diagram(
+            full_source,
+            svg_path,
+            theme=THEME,
+            background=BACKGROUND,
+            width=WIDTH,
+            height=HEIGHT,
+            add_border=True,
+        )
+        print(f'Saved SVG with border -> {path_svg}')

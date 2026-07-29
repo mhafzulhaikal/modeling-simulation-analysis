@@ -50,7 +50,7 @@ FONT_FAMILY = 'serif'
 FONT_SIZE = 12
 FONT_SERIF = ['Times New Roman', 'Times']
 COLORS = {'Syn': '#0055cc', 'QDR': '#d65a00', 'IAE': '#008000'}
-DPI = 600
+DPI = 1000
 
 
 def _out(loop: str, subfolder: str, filename: str) -> str:

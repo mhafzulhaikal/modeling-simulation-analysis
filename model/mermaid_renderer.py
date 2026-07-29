@@ -26,7 +26,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 _BASE_DPI: int = 96
-DEFAULT_SCALE: int = 13  # 96 × 13 = 1248 dpi  (≥ 1200 dpi requirement)
+DEFAULT_SCALE: int = 10  # 96 × 10 = 960 dpi (~1000 DPI high-resolution raster output)
 
 _GENERIC_FONTS = frozenset(
     {'serif', 'sans-serif', 'monospace', 'inherit', 'cursive', 'fantasy', 'system-ui'}
@@ -71,6 +71,10 @@ def render(
     mermaid_config: dict | None = None,
     project_root: str | Path | None = None,
     quiet: bool = True,
+    add_border: bool = False,
+    border_color: str = 'black',
+    border_width: float = 2.0,
+    border_radius: float = 0.0,
 ) -> Path:
     """Render Mermaid source to SVG, PNG, or PDF.
 
@@ -93,7 +97,7 @@ def render(
         Background colour (CSS string or ``'transparent'``).
     scale:
         Puppeteer scale factor (PNG/PDF only).
-        Effective DPI = 96 × scale.  Default 13 → **1248 dpi**.
+        Effective DPI = 96 × scale.  Default 3 → **288 dpi (~300 DPI)**.
         Has no visual effect on SVG output.
     width / height:
         Puppeteer viewport size in pixels.  Default: 800 × 600.
@@ -109,6 +113,10 @@ def render(
         Directory containing ``node_modules/``.  Defaults to ``Path.cwd()``.
     quiet:
         Suppress mmdc log output (``--quiet`` flag).
+    add_border:
+        Whether to add an outline border rect to SVG outputs.
+    border_color / border_width / border_radius:
+        Outline border styling options for SVG.
 
     Returns
     -------
@@ -130,9 +138,9 @@ def render(
     effective_dpi = _BASE_DPI * scale
     if fmt == 'png':
         logger.info('Rendering PNG  scale=%d  effective-DPI=%d', scale, effective_dpi)
-        if effective_dpi < 1200:
+        if scale > 5:
             logger.warning(
-                'scale=%d yields only %d dpi (< 1200). Use scale >= 13.',
+                'scale=%d yields %d dpi (> 480 dpi). Extreme image dimensions (> 50 MP) may cause MS Word / PDF export downsampling corruption.',
                 scale,
                 effective_dpi,
             )
@@ -194,6 +202,9 @@ def render(
 
         if not output.exists():
             raise RuntimeError(f'mmdc reported success but output not found: {output}')
+
+    if fmt == 'svg' and add_border:
+        add_svg_border(output, color=border_color, width=border_width, radius=border_radius)
 
     size_kb = output.stat().st_size / 1024
     logger.info('Saved %s  (%.1f kB)', output, size_kb)
@@ -338,9 +349,9 @@ def embed_fonts_svg(svg_path: str | Path, output: str | Path | None = None) -> P
 
 def add_svg_border(
     svg_path: str | Path,
-    color: str = '#e5e5e5',
+    color: str = 'black',
     width: float = 2.0,
-    radius: float = 8.0,
+    radius: float = 0.0,
 ) -> Path:
     """Draw a bounding box (outline) around the entire SVG diagram.
 

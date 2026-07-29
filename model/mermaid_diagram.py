@@ -43,6 +43,10 @@ class _Diagram(ABC):
         width: int = 800,
         height: int = 600,
         mermaid_config: dict | None = None,
+        add_border: bool = False,
+        border_color: str = 'black',
+        border_width: float = 2.0,
+        border_radius: float = 0.0,
     ) -> Path:
         """Render and save to *output*.
 
@@ -55,7 +59,7 @@ class _Diagram(ABC):
             Destination path, e.g. ``'outputs/diagrams/my_diagram.svg'``.
         scale:
             PNG/PDF Puppeteer scale factor.  Effective DPI = 96 × scale.
-            Default 13 → 1248 dpi.  Ignored for SVG.
+            Default 3 → 288 dpi.  Ignored for SVG.
         theme:
             ``'default'``, ``'forest'``, ``'dark'``, or ``'neutral'``.
         background:
@@ -64,6 +68,10 @@ class _Diagram(ABC):
             Puppeteer viewport dimensions (pixels).
         mermaid_config:
             Extra Mermaid config dict, e.g. ``{'htmlLabels': False}``.
+        add_border:
+            Whether to add an outline border rect to SVG outputs.
+        border_color / border_width / border_radius:
+            Outline border styling options for SVG.
 
         Returns
         -------
@@ -79,6 +87,10 @@ class _Diagram(ABC):
             width=width,
             height=height,
             mermaid_config=mermaid_config,
+            add_border=add_border,
+            border_color=border_color,
+            border_width=border_width,
+            border_radius=border_radius,
         )
 
 
@@ -344,6 +356,10 @@ def save_diagram(
     width: int = 800,
     height: int = 600,
     mermaid_config: dict | None = None,
+    add_border: bool = False,
+    border_color: str = 'black',
+    border_width: float = 2.0,
+    border_radius: float = 0.0,
 ) -> Path:
     """Render raw Mermaid *source* text directly to *output*.
 
@@ -357,8 +373,8 @@ def save_diagram(
     output:
         Destination path — extension sets format: ``.svg``, ``.png``, ``.pdf``.
     scale:
-        PNG/PDF scale factor.  Default 13 → 1248 dpi.
-    theme / background / width / height / mermaid_config:
+        PNG/PDF scale factor.  Default 3 → 288 dpi (~300 DPI print quality).
+    theme / background / width / height / mermaid_config / add_border / border_color:
         Forwarded to :func:`~model.mermaid_renderer.render`.
 
     Returns
@@ -387,4 +403,8 @@ def save_diagram(
         width=width,
         height=height,
         mermaid_config=mermaid_config,
+        add_border=add_border,
+        border_color=border_color,
+        border_width=border_width,
+        border_radius=border_radius,
     )
